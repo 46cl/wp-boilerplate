@@ -1,0 +1,15 @@
+{
+  "name": "wp-boilerplate",
+  "version": "1.0.0",
+  "description": "Un boilerplate Wordpress pour l'équipe de 46cl",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "shelljs": "^0.3.0"
+  },
+  "scripts": {
+    "install": "gulp wp-init",
+    "clean": "gulp wp-clean"
+  },
+  "author": "46cl"
+}

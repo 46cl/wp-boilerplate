@@ -1,0 +1,15 @@
+apache_modules:
+    - mod_rewrite
+
+core config:
+    dbuser: root
+    dbpass:
+    extra-php: |
+        /** Avoid any file modifications by the users */
+        define('DISALLOW_FILE_MODS', true);
+
+core install:
+    url: localhost:8080
+    admin_user: admin
+    admin_password: admin
+    admin_email: none@46cl.fr
