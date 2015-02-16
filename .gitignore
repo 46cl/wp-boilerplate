@@ -1,15 +1,16 @@
+# Node files
+
 node_modules/
 npm-debug.log
 
-public/*.log
-public/sitemap.xml
-public/sitemap.xml.gz
-public/wp-config.php
-public/wp-content/advanced-cache.php
-public/wp-content/backup-db/
-public/wp-content/backups/
-public/wp-content/blogs.dir/
-public/wp-content/cache/
-public/wp-content/upgrade/
-public/wp-content/uploads/
-public/wp-content/wp-cache-config.php
+# Wordpress files
+
+public/*
+!public/.htaccess
+!public/wp-content
+
+public/wp-content/*
+!public/wp-content/themes
+
+public/wp-content/themes/*
+!public/wp-content/themes/project-theme

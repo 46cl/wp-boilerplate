@@ -1,5 +1,13 @@
 {
     "title": "Example Project",
     "slug": "example-project",
-    "database": "exampleproject"
+    "database": "exampleproject",
+
+    "wordpress": {
+        "version": null,
+
+        "plugins": {
+            "timber-library": null
+        }
+    }
 }
