@@ -1,0 +1,49 @@
+<!-- Upload button -->
+
+<script type="text/ng-template" id="upload-box.html">
+    <div ng-click="openModal()" class="upload-box">
+        <input ng-if="!binded" type="hidden" name="(( name ))" value="(( image | json ))">
+        <img ng-show="image" ng-src="(( image.url ))">
+        <input ng-hide="image" class="button" type="button" value="(( label ))">
+    </div>
+</script>
+
+<!-- Sequential boxes: core -->
+
+<script type="text/ng-template" id="sequential-boxes.html">
+    <input ng-click="add()" class="button" type="button" value="Ajouter">
+
+    <div ui-sortable ng-model="data">
+        <div ng-repeat="dataSet in data" class="sequential-box">
+            <div ng-repeat="field in fields">
+                <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
+            </div>
+
+            <div class="text-center">
+                <input ng-click="remove(dataSet)" class="button" type="button" value="Supprimer">
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" name="(( name ))" value="(( data ))">
+</script>
+
+<!-- Sequential boxes: fields -->
+
+<script type="text/ng-template" id="field-upload.html">
+    <upload-box label="(( field.label ))" ng-model="dataSet[field.name]"></upload-box>
+</script>
+
+<script type="text/ng-template" id="field-text.html">
+    <label>
+        <strong>(( field.label ))</strong> <br>
+        <input ng-model="dataSet[field.name]" type="text">
+    </label>
+</script>
+
+<script type="text/ng-template" id="field-textarea.html">
+    <label>
+        <strong>(( field.label ))</strong> <br>
+        <textarea ng-model="dataSet[field.name]"></textarea>
+    </label>
+</script>

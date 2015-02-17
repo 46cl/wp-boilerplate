@@ -1,0 +1,59 @@
+/*
+ * Sequential boxes
+ */
+
+.sequential-box {
+    vertical-align: middle;
+    display: inline-block;
+    margin: 20px 20px 0 0;
+    border: 1px dashed #ccc;
+    min-width: 200px;
+    padding: 10px;
+    background: #fff;
+}
+
+.sequential-box .upload-box, .sequential-box label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.sequential-box textarea {
+    width: 400px;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.sequential-box .upload-box {
+    margin: 0 auto 10px auto;
+}
+
+/*
+ * Upload boxes
+ */
+
+.upload-box {
+    margin: 20px auto;
+    border: 1px dashed #ccc;
+    max-width: 400px;
+    height: 100px;
+    padding: 10px;
+    text-align: center;
+    font-size: 0;
+    cursor: pointer;
+}
+
+.upload-box::before {
+    vertical-align: middle;
+    display: inline-block;
+    height: 100%;
+    content: '';
+}
+
+.upload-box img, .upload-box .button {
+    vertical-align: middle;
+}
+
+.upload-box img {
+    max-width: 100%;
+    max-height: 100%;
+}
