@@ -120,11 +120,8 @@ gulp.task('wp-init', function(cb) {
             shell.exec('git remote remove origin', {silent: true});
 
             // Commit the new Wordpress install
-            console.log('Commiting...');
             shell.exec('git add -A');
-
-            var wpVersion = shell.exec('wp core version', {silent: true}).output.trim();
-            shell.exec('git commit -m "New Wordpress install (v' + wpVersion + ')"', {silent: true});
+            shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
         }
 
         cb();
