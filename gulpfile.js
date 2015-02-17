@@ -123,12 +123,8 @@ gulp.task('wp-init', function(cb) {
             console.log('Commiting...');
             shell.exec('git add -A');
 
-            var wpVersion = shell.exec('wp core version', {silent: true}).output.trim(),
-                timberVersion = JSON.parse(
-                    shell.exec('wp plugin get timber-library --format=json', {silent: true}).output.trim()
-                ).version;
-
-            shell.exec('git commit -m "New Wordpress install (v' + wpVersion + ')', {silent: true});
+            var wpVersion = shell.exec('wp core version', {silent: true}).output.trim();
+            shell.exec('git commit -m "New Wordpress install (v' + wpVersion + ')"', {silent: true});
         }
 
         cb();
