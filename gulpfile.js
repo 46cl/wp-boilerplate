@@ -41,7 +41,7 @@ function cleanWpProject() {
     });
 
     // Drop the database
-    shell.exec('mysql -u root -e "drop database \\`' + project.database + '\\`;"', {silent: true});
+    shell.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
 
 }
 
@@ -62,69 +62,65 @@ function pluginOutput(command) {
 
 gulp.task('wp-clean', cleanWpProject);
 
-gulp.task('wp-init', function(cb) {
+gulp.task('wp-init', function() {
 
-    shell.exec('wp core is-installed', {silent: true}, function(code) {
-        if (code) {
-            cleanWpProject();
+    if (shell.exec('wp core is-installed', {silent: true}).code) {
+        cleanWpProject();
 
-            // Download and configure Wordpress
-            if (!project.wordpress.version) {
-                shell.exec('wp core download --locale=fr_FR');
-            } else {
-                shell.exec('wp core download --locale=fr_FR --version=' + project.wordpress.version);
-            }
-
-            shell.exec('wp core config --dbname="' + project.database + '"');
-
-            // Create the database and run the installer
-            shell.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
-            shell.exec('wp core install --title="' + project.title + '"');
-
-            // Remove and install plugins
-            pluginList().forEach(function(plugin) {
-                pluginOutput('wp plugin uninstall ' + plugin.name);
-            });
-
-            Object.keys(project.wordpress.plugins).forEach(function(name) {
-                var version = project.wordpress.plugins[name];
-
-                if (!version) {
-                    pluginOutput('wp plugin install ' + name + ' --activate');
-                } else {
-                    pluginOutput('wp plugin install ' + name + ' --version=' + version + ' --activate');
-                }
-            });
-
-            // Activate the project theme and remove the default ones provided with a new Wordpress installation
-            shell.exec('wp theme activate project-theme');
-            shell.exec('wp theme delete twentythirteen twentyfourteen twentyfifteen');
-
-            // Configure the rewriting rules
-            shell.exec('wp rewrite structure "/%postname%/" --hard');
-
-            // Add an empty "wp-cli.yml" file to the public folder to avoid server issues
-            // See: https://github.com/wp-cli/server-command/issues/3#issuecomment-74491413
-            fs.writeFileSync('wp-cli.yml', '');
-
-            // Save the versions of the dependencies
-            project.wordpress.version = shell.exec('wp core version', {silent: true}).output.trim();
-
-            pluginList().forEach(function(plugin) {
-                project.wordpress.plugins[plugin.name] = plugin.version;
-            });
-
-            fs.writeFileSync('../wp-project.json', JSON.stringify(project, null, 4));
-
-            // Remove the "origin" Git remote, avoiding any unwanted new commits on the boilerplate repository.
-            shell.exec('git remote remove origin', {silent: true});
-
-            // Commit the new Wordpress install
-            shell.exec('git add -A');
-            shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+        // Download and configure Wordpress
+        if (!project.wordpress.version) {
+            shell.exec('wp core download --locale=fr_FR');
+        } else {
+            shell.exec('wp core download --locale=fr_FR --version=' + project.wordpress.version);
         }
 
-        cb();
-    });
+        shell.exec('wp core config --dbname="' + project.database + '"');
+
+        // Create the database and run the installer
+        shell.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
+        shell.exec('wp core install --title="' + project.title + '"');
+
+        // Remove and install plugins
+        pluginList().forEach(function(plugin) {
+            pluginOutput('wp plugin uninstall ' + plugin.name);
+        });
+
+        Object.keys(project.wordpress.plugins).forEach(function(name) {
+            var version = project.wordpress.plugins[name];
+
+            if (!version) {
+                pluginOutput('wp plugin install ' + name + ' --activate');
+            } else {
+                pluginOutput('wp plugin install ' + name + ' --version=' + version + ' --activate');
+            }
+        });
+
+        // Activate the project theme and remove the default ones provided with a new Wordpress installation
+        shell.exec('wp theme activate project-theme');
+        shell.exec('wp theme delete twentythirteen twentyfourteen twentyfifteen');
+
+        // Configure the rewriting rules
+        shell.exec('wp rewrite structure "/%postname%/" --hard');
+
+        // Add an empty "wp-cli.yml" file to the public folder to avoid server issues
+        // See: https://github.com/wp-cli/server-command/issues/3#issuecomment-74491413
+        fs.writeFileSync('wp-cli.yml', '');
+
+        // Save the versions of the dependencies
+        project.wordpress.version = shell.exec('wp core version', {silent: true}).output.trim();
+
+        pluginList().forEach(function(plugin) {
+            project.wordpress.plugins[plugin.name] = plugin.version;
+        });
+
+        fs.writeFileSync('../wp-project.json', JSON.stringify(project, null, 4));
+
+        // Remove the "origin" Git remote, avoiding any unwanted new commits on the boilerplate repository.
+        shell.exec('git remote remove origin');
+
+        // Commit the new Wordpress install
+        shell.exec('git add -A');
+        shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+    }
 
 });
