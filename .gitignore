@@ -7,10 +7,13 @@ npm-debug.log
 
 public/*
 !public/.htaccess
-!public/wp-content
+!public/wp-content/
 
 public/wp-content/*
-!public/wp-content/themes
+!public/wp-content/themes/
 
-public/wp-content/themes/*
-!public/wp-content/themes/project-theme
+public/wp-content/themes/index.php
+
+# Theme files
+
+public/wp-content/themes/*/assets/

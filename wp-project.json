@@ -9,5 +9,17 @@
         "plugins": {
             "timber-library": null
         }
+    },
+
+    "assets-paths": {
+        "src": {
+            "stylesheets": "%theme_path%/app/stylesheets/app.less",
+            "scripts": "%theme_path%/app/scripts/*"
+        },
+
+        "dest": {
+            "stylesheets": "%theme_path%/assets/",
+            "scripts": "%theme_path%/assets/"
+        }
     }
 }
