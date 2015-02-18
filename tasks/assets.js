@@ -22,7 +22,7 @@ var concat = require('gulp-concat'),
  */
 
 function path(path) {
-    return path.replace(/%theme_path%/g, 'wp-content/themes/project-theme');
+    return path.replace(/%theme_path%/g, 'public/wp-content/themes/project-theme');
 }
 
 function error(error) {
