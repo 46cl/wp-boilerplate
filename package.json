@@ -2,19 +2,20 @@
   "name": "wp-boilerplate",
   "version": "1.0.0",
   "description": "Un boilerplate Wordpress pour l'équipe de 46cl",
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
+    "bower": "^1.3.12",
     "chalk": "^0.5.1",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.5.0",
     "gulp-less": "^3.0.0",
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^1.1.0",
+    "gulp-util": "^3.0.3",
     "shelljs": "^0.3.0"
   },
   "scripts": {
-    "install": "gulp wp-init",
+    "install": "gulp wp-init && bower install --config.interactive=false",
     "clean": "gulp wp-clean"
   },
-  "author": "46cl"
+  "author": "46cl <hello@46cl.fr>"
 }

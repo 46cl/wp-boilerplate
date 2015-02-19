@@ -1,11 +1,13 @@
 # Requirements
 
 * Git
-* PHP
-* MySQL
+* PHP 5.3+
+* MySQL 5.5+
 * Node.js
 * [WP-CLI](http://wp-cli.org/)
 * [wp server](https://github.com/wp-cli/server-command)
+
+Tested on Wordpress 4.1
 
 # Installation
 

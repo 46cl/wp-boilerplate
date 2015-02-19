@@ -13,8 +13,15 @@
 
     "assets-paths": {
         "src": {
-            "stylesheets": "%theme_path%/app/stylesheets/app.less",
-            "scripts": "%theme_path%/app/scripts/*"
+            "vendor": {
+                "stylesheets": "bower_components/normalize.css/normalize.css",
+                "scripts": ""
+            },
+
+            "app": {
+                "stylesheets": "%theme_path%/app/stylesheets/app.less",
+                "scripts": "%theme_path%/app/scripts/*"
+            }
         },
 
         "dest": {

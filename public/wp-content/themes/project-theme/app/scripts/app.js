@@ -1,1 +1,7 @@
-console.info('Your new Wordpress project is ready to rock!');
+jQuery(function($) {
+
+    'use strict';
+
+    console.info($('p').html());
+
+});

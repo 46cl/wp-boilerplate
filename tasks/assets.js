@@ -13,6 +13,7 @@ var chalk = require('chalk'),
  */
 
 var concat = require('gulp-concat'),
+    gutil = require('gulp-util'),
     less = require('gulp-less'),
     rename = require('gulp-rename'),
     uglify = require('gulp-uglify');
@@ -31,29 +32,48 @@ function error(error) {
 }
 
 /*
- * Tasks
+ * Transformers
  */
 
-gulp.task('default', ['stylesheets', 'scripts']);
+function stylesheetsTransformer(src, isVendor) {
 
-gulp.task('stylesheets', function() {
-
-    return gulp.src(path(paths.src.stylesheets))
+    return gulp.src(path(src))
+        .pipe(!isVendor ? gutil.noop() : concat('vendor.css'))
         .pipe(less({ compress: true }).on('error', error))
-        .pipe(rename({
-            extname: '.css'
-        }))
+        .pipe(!isVendor ? rename({extname: '.css'}) : gutil.noop())
         .pipe(gulp.dest(path(paths.dest.stylesheets)));
 
-});
+}
 
-gulp.task('scripts', function() {
+function scriptsTransformer(src, isVendor) {
 
-    return gulp.src(path(paths.src.scripts))
-        .pipe(concat('app.js'))
+    return gulp.src(path(src))
+        .pipe(concat(!isVendor ? 'app.js' : 'vendor.js'))
         .pipe(uglify().on('error', error))
         .pipe(gulp.dest(path(paths.dest.scripts)));
 
+}
+
+/*
+ * Tasks
+ */
+
+gulp.task('default', ['vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
+
+gulp.task('vendor/stylesheets', function() {
+    return stylesheetsTransformer(paths.src.vendor.stylesheets, true);
+});
+
+gulp.task('vendor/scripts', function() {
+    return scriptsTransformer(paths.src.vendor.scripts, true);
+});
+
+gulp.task('app/stylesheets', function() {
+    return stylesheetsTransformer(paths.src.app.stylesheets);
+});
+
+gulp.task('app/scripts', function() {
+    return scriptsTransformer(paths.src.app.scripts);
 });
 
 /*

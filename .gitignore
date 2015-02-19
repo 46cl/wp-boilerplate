@@ -1,9 +1,13 @@
-# Node files
+# Node
 
 node_modules/
 npm-debug.log
 
-# Wordpress files
+# Bower
+
+bower_components/
+
+# Wordpress
 
 public/*
 !public/.htaccess
@@ -14,6 +18,6 @@ public/wp-content/*
 
 public/wp-content/themes/index.php
 
-# Theme files
+# Theme
 
 public/wp-content/themes/*/assets/
