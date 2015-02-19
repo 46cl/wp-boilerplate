@@ -5,9 +5,9 @@ Tested on Wordpress 4.1
 ## Requirements
 
 * [Git](http://git-scm.com/)
-* [PHP](http://php.net/) 5.3+
-* [MySQL](http://www.mysql.fr/) 5.5+
-* [Node.js](http://nodejs.org/)
+* [PHP](http://php.net/) v5.3+
+* [MySQL](http://www.mysql.fr/) v5.5+
+* [Node.js](http://nodejs.org/) (with NPM v2+)
 * [WP-CLI](http://wp-cli.org/)
 * [wp server](https://github.com/wp-cli/server-command)
 
@@ -50,10 +50,10 @@ Then install the dependencies and run the installer:
 
 ```shell
 npm install
-npm run init
+npm run wp-install
 ```
 
-If the installation failed for any reason, just run `npm run clean` to rollback to the previous state. It doesn't cancel the created commit but if you reached this point there shouldn't be any issues that requires a rollback.
+If the installation failed for any reason, just run `npm run wp-clean` to rollback to the previous state. It doesn't cancel the created commit but if you reached this point there shouldn't be any issues that requires a rollback.
 
 ## Serve the project locally
 
@@ -61,3 +61,13 @@ If the installation failed for any reason, just run `npm run clean` to rollback 
 cd public/
 wp server
 ```
+
+## Contribute
+
+Clone the repository and add this line to your `~/.profile`:
+
+```shell
+export WP_BOILERPLATE_ENV="dev"
+```
+
+This will bypass any Git alterations when running the `npm run wp-install` command. If you occasionally want to revert back to the default environment, use `npm run wp-install -- --skip-env-check`.

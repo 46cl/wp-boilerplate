@@ -11,12 +11,13 @@
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^1.1.0",
     "gulp-util": "^3.0.3",
-    "shelljs": "^0.3.0"
+    "shelljs": "^0.3.0",
+    "yargs": "^3.0.4"
   },
   "scripts": {
     "install": "bower install --config.interactive=false && gulp",
-    "init": "gulp wp-init",
-    "clean": "gulp wp-clean"
+    "wp-install": "gulp wp-install",
+    "wp-clean": "gulp wp-clean"
   },
   "author": "46cl <hello@46cl.fr>"
 }

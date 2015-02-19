@@ -4,9 +4,11 @@
 
 var project = require('../wp-project.json');
 
-var fs = require('fs'),
+var chalk = require('chalk'),
+    fs = require('fs'),
     gulp = require('gulp'),
-    shell = require('shelljs');
+    shell = require('shelljs')
+    argv = require('yargs').argv;
 
 var wpRoot = 'public';
 
@@ -46,7 +48,7 @@ function pluginList() {
 
 gulp.task('wp-clean', cleanWp);
 
-gulp.task('wp-init', function() {
+gulp.task('wp-install', function() {
 
     if (wp('core is-installed', true).code) {
         cleanWp();
@@ -90,21 +92,29 @@ gulp.task('wp-init', function() {
         // See: https://github.com/wp-cli/server-command/issues/3#issuecomment-74491413
         fs.writeFileSync(wpRoot + '/wp-cli.yml', '');
 
-        // Save the versions of the dependencies
-        project.wordpress.version = wp('core version', true).output.trim();
+        if (process.env.WP_BOILERPLATE_ENV.toLowerCase() != 'dev' || argv.skipEnvCheck) {
+            // Save the versions of the dependencies
+            project.wordpress.version = wp('core version', true).output.trim();
 
-        pluginList().forEach(function(plugin) {
-            project.wordpress.plugins[plugin.name] = plugin.version;
-        });
+            pluginList().forEach(function(plugin) {
+                project.wordpress.plugins[plugin.name] = plugin.version;
+            });
 
-        fs.writeFileSync('wp-project.json', JSON.stringify(project, null, 4));
+            fs.writeFileSync('wp-project.json', JSON.stringify(project, null, 4));
 
-        // Remove the "origin" Git remote, avoiding any unwanted new commits on the boilerplate repository.
-        shell.exec('git remote remove origin');
+            // Remove the "origin" Git remote, avoiding any unwanted new commits on the boilerplate repository.
+            shell.exec('git remote remove origin');
 
-        // Commit the new Wordpress install
-        shell.exec('git add -A');
-        shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+            // Commit the new Wordpress install
+            shell.exec('git add -A');
+            shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+        } else {
+            console.log([
+                chalk.blue('WP_BOILERPLATE_ENV') + ' set to ' + chalk.green('dev') + '\n',
+                chalk.yellow('Bypassed') + ': Rewriting of ' + chalk.magenta('wp-config.json') + '...',
+                chalk.yellow('Bypassed') + ': Git alterations...\n'
+            ].join('\n'));
+        }
     }
 
 });
