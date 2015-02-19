@@ -1,14 +1,17 @@
+'use strict';
+
 /*
  * Requirements
  */
 
 var project = require('../wp-project.json');
 
-var chalk = require('chalk'),
+var argv = require('yargs').argv,
+    chalk = require('chalk'),
     fs = require('fs'),
     gulp = require('gulp'),
-    shell = require('shelljs')
-    argv = require('yargs').argv;
+    shell = require('shelljs'),
+    spawn = require('child_process').spawn;
 
 var wpRoot = 'public';
 
@@ -116,5 +119,14 @@ gulp.task('wp-install', function() {
             ].join('\n'));
         }
     }
+
+});
+
+gulp.task('wp-serve', function(cb) {
+
+    shell.cd(wpRoot);
+
+    // Use the spawn method to preserve colors in the console
+    spawn('wp', ['server'], {stdio: 'inherit'});
 
 });

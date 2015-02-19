@@ -27,6 +27,8 @@
         "dest": {
             "stylesheets": "%theme_path%/assets/",
             "scripts": "%theme_path%/assets/"
-        }
+        },
+
+        "watch": "%theme_path%/app/**"
     }
 }

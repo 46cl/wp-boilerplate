@@ -57,10 +57,9 @@ If the installation failed for any reason, just run `npm run wp-clean` to rollba
 
 ## Serve the project locally
 
-```shell
-cd public/
-wp server
-```
+To run a local server, use `npm run wp-serve`.
+
+To watch for your assets modifications, run `npm run watch`.
 
 ## Contribute
 

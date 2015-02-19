@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Requirements
  */
@@ -80,10 +82,11 @@ gulp.task('app/scripts', function() {
  * Watching tasks
  */
 
-gulp.task('watch', function() {
-    var watcher = gulp.watch(paths.watch, ['default']);
+gulp.task('watch', function(cb) {
+    var watcher = gulp.watch(path(paths.watch), ['default']);
 
     watcher.on('change', function(event) {
-        console.log(chalk.yellow('\nFile '+ event.path +' was '+ event.type +', running tasks...\n'));
+        var type = event.type.toUpperCase().slice(0, 1) + event.type.toLowerCase().slice(1);
+        console.log('\n' + chalk.yellow(type) + ': ' + chalk.magenta(event.path) + '\n');
     });
 });
