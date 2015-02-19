@@ -14,7 +14,8 @@
     "shelljs": "^0.3.0"
   },
   "scripts": {
-    "install": "gulp wp-init && bower install --config.interactive=false",
+    "install": "bower install --config.interactive=false && gulp",
+    "init": "gulp wp-init",
     "clean": "gulp wp-clean"
   },
   "author": "46cl <hello@46cl.fr>"
