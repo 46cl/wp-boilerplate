@@ -23,23 +23,7 @@ function wp(command, silent) {
 function cleanWp() {
 
     // Remove all Wordpress files
-    shell.ls(wpRoot).forEach(function(file) {
-        if (file.indexOf('wp-content') == -1) {
-            shell.rm('-rf', wpRoot + '/' + file);
-        }
-    });
-
-    shell.ls(wpRoot + '/wp-content').forEach(function(file) {
-        if (file.indexOf('themes') == -1) {
-            shell.rm('-rf', wpRoot + '/wp-content/' + file);
-        }
-    });
-
-    shell.ls(wpRoot + '/wp-content/themes').forEach(function(file) {
-        if (file.indexOf('project-theme') == -1) {
-            shell.rm('-rf', wpRoot + '/wp-content/themes/' + file);
-        }
-    });
+    shell.exec('git clean -fdx ' + wpRoot);
 
     // Drop the database
     shell.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
