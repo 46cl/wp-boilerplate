@@ -4,7 +4,7 @@
  * Requirements
  */
 
-var project = require('../wp-project.json');
+var project = require('./wp-project.json');
 
 var argv = require('yargs').argv,
     chalk = require('chalk'),
@@ -24,17 +24,6 @@ function wp(command, silent) {
     return shell.exec('wp ' + command + ' --path=' + wpRoot, {silent: silent});
 }
 
-// Cleans the project to its state before any installation
-function cleanWp() {
-
-    // Remove all Wordpress files
-    shell.exec('git clean -fdx ' + wpRoot);
-
-    // Drop the database
-    shell.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
-
-}
-
 // Cleans the output when installing or removing a plugin
 function cleanOutput(output) {
     console.log(output.replace(/&rsquo;/g, "'").trim());
@@ -49,12 +38,23 @@ function pluginList() {
  * Tasks
  */
 
-gulp.task('wp-clean', cleanWp);
+var tasks = {};
 
-gulp.task('wp-install', function() {
+// Cleans the project to its state before any installation
+tasks.clean = function() {
+
+    // Remove all Wordpress files
+    shell.exec('git clean -fdx ' + wpRoot);
+
+    // Drop the database
+    shell.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
+
+};
+
+tasks.install = function() {
 
     if (wp('core is-installed', true).code) {
-        cleanWp();
+        tasks.clean();
 
         // Download and configure Wordpress
         if (!project.wordpress.version) {
@@ -113,20 +113,26 @@ gulp.task('wp-install', function() {
             shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
         } else {
             console.log([
-                chalk.blue('WP_BOILERPLATE_ENV') + ' set to ' + chalk.green('dev') + '\n',
+                '\n' + chalk.blue('WP_BOILERPLATE_ENV') + ' set to ' + chalk.green('dev') + '\n',
                 chalk.yellow('Bypassed') + ': Rewriting of ' + chalk.magenta('wp-config.json') + '...',
                 chalk.yellow('Bypassed') + ': Git alterations...\n'
             ].join('\n'));
         }
     }
 
-});
+};
 
-gulp.task('wp-serve', function(cb) {
+tasks.serve = function() {
 
     shell.cd(wpRoot);
 
     // Use the spawn method to preserve colors in the console
     spawn('wp', ['server'], {stdio: 'inherit'});
 
-});
+};
+
+/*
+ * Run request task
+ */
+
+tasks[argv._[0]]();

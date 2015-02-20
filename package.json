@@ -16,9 +16,9 @@
   },
   "scripts": {
     "install": "bower install --config.interactive=false && gulp",
-    "wp-install": "gulp wp-install",
-    "wp-clean": "gulp wp-clean",
-    "wp-serve": "gulp wp-serve",
+    "wp-install": "node wp-manager install",
+    "wp-clean": "node wp-manager clean",
+    "wp-serve": "node wp-manager serve",
     "watch": "gulp && echo '\\n' && gulp watch"
   },
   "author": "46cl <hello@46cl.fr>"
