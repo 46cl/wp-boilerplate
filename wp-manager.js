@@ -13,118 +13,194 @@ var argv = require('yargs').argv,
     shell = require('shelljs'),
     spawn = require('child_process').spawn;
 
-var wpRoot = 'public';
+/*
+ * Constants
+ */
+
+var WP_BOILERPLATE_ENV = process.env.WP_BOILERPLATE_ENV.toLowerCase();
+
+var WP_ROOT = 'public',
+    ENV = !argv.skipEnvCheck && ['prod', 'dev', 'contrib'].indexOf(WP_BOILERPLATE_ENV) != -1
+        ? process.env.WP_BOILERPLATE_ENV.toLowerCase()
+        : 'dev';
 
 /*
  * Helpers
  */
 
-// Runs a WP command
-function wp(command, silent) {
-    return shell.exec('wp ' + command + ' --path=' + wpRoot, {silent: silent});
-}
+var manager = {
 
-// Cleans the output when installing or removing a plugin
-function cleanOutput(output) {
-    console.log(output.replace(/&rsquo;/g, "'").trim());
-}
+    errorsOccured: false,
 
-// Returns the currently installed plugins
-function pluginList() {
-    return JSON.parse(wp('plugin list --format=json', true).output.trim());
-}
+    // Executes a new task
+    task: function(message, execTask, envs) {
+        process.stdout.write(chalk.yellow('Running: ') + message + '... ');
 
-/*
- * Tasks
- */
-
-var tasks = {};
-
-// Cleans the project to its state before any installation
-tasks.clean = function() {
-
-    // Remove all Wordpress files
-    shell.exec('git clean -fdx ' + wpRoot);
-
-    // Drop the database
-    shell.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
-
-};
-
-tasks.install = function() {
-
-    if (wp('core is-installed', true).code) {
-        tasks.clean();
-
-        // Download and configure Wordpress
-        if (!project.wordpress.version) {
-            wp('core download --locale=fr_FR');
-        } else {
-            wp('core download --locale=fr_FR --version=' + project.wordpress.version);
-        }
-
-        wp('core config --dbname="' + project.database + '"');
-
-        // Create the database and run the installer
-        shell.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
-        wp('core install --title="' + project.title + '"');
-
-        // Remove and install plugins
-        pluginList().forEach(function(plugin) {
-            cleanOutput(wp('plugin uninstall ' + plugin.name, true).output);
-        });
-
-        Object.keys(project.wordpress.plugins).forEach(function(name) {
-            var version = project.wordpress.plugins[name];
-
-            if (!version) {
-                cleanOutput(wp('plugin install ' + name + ' --activate', true).output);
-            } else {
-                cleanOutput(wp('plugin install ' + name + ' --version=' + version + ' --activate', true).output);
+        if (!envs || envs.indexOf(ENV) != -1) {
+            try {
+                execTask();
+                console.log(chalk.green('Success'));
+            } catch(error) {
+                this.errorsOccured = true;
+                console.log(chalk.red('Error: ') + error.trim().replace(/[\n\r]/g, ' '));
             }
-        });
-
-        // Activate the project theme and remove the default ones provided with a new Wordpress installation
-        wp('theme activate project-theme');
-        wp('theme delete twentythirteen twentyfourteen twentyfifteen');
-
-        // Configure the rewriting rules
-        wp('rewrite structure "/%postname%/" --hard');
-
-        // Add an empty "wp-cli.yml" file to the public folder to avoid server issues
-        // See: https://github.com/wp-cli/server-command/issues/3#issuecomment-74491413
-        fs.writeFileSync(wpRoot + '/wp-cli.yml', '');
-
-        if (process.env.WP_BOILERPLATE_ENV.toLowerCase() != 'dev' || argv.skipEnvCheck) {
-            // Save the versions of the dependencies
-            project.wordpress.version = wp('core version', true).output.trim();
-
-            pluginList().forEach(function(plugin) {
-                project.wordpress.plugins[plugin.name] = plugin.version;
-            });
-
-            fs.writeFileSync('wp-project.json', JSON.stringify(project, null, 4));
-
-            // Remove the "origin" Git remote, avoiding any unwanted new commits on the boilerplate repository.
-            shell.exec('git remote remove origin');
-
-            // Commit the new Wordpress install
-            shell.exec('git add -A');
-            shell.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
         } else {
-            console.log([
-                '\n' + chalk.blue('WP_BOILERPLATE_ENV') + ' set to ' + chalk.green('dev') + '\n',
-                chalk.yellow('Bypassed') + ': Rewriting of ' + chalk.magenta('wp-config.json') + '...',
-                chalk.yellow('Bypassed') + ': Git alterations...\n'
-            ].join('\n'));
+            var envsOutput = envs.map(function(env) {
+                return chalk.cyan(env);
+            }).join(', ');
+
+            console.log(chalk.yellow('Bypassed:') + ' Requires one of the following environments: ' + envsOutput);
         }
+    },
+
+    // Runs a command
+    exec: function(command) {
+        var result = shell.exec(command, {silent: true});
+
+        if (result.code) {
+            throw new Error(result.output);
+        }
+
+        return result.output;
+    },
+
+    writeFile: function(filepath, content) {
+        if (fs.writeFileSync(filepath, content)) {
+            throw new Error("The file cannot be written...");
+        }
+    },
+
+    // Runs a WP command
+    wp: function(command) {
+        return this.exec('wp ' + command + ' --path=' + WP_ROOT);
+    },
+
+    // Returns installed WP plugins
+    wpPlugins: function() {
+        return JSON.parse(this.wp('plugin list --format=json').trim());
     }
 
 };
 
-tasks.serve = function() {
+/*
+ * Commands
+ */
 
-    shell.cd(wpRoot);
+var commands = {};
+
+// Cleans the project to its initial state before any installation
+commands.clean = function() {
+
+    manager.task('Removing all Wordpress files', function() {
+        manager.exec('git clean -fdx ' + WP_ROOT);
+    });
+
+    manager.task('Dropping the database', function() {
+        manager.exec('mysql -u root -e "drop database if exists \\`' + project.database + '\\`;"');
+    });
+
+};
+
+commands.install = function() {
+
+    try {
+
+        manager.wp('core is-installed');
+        console.log(chalk.yellow('Cancelled:') + ' Wordpress seems already installed');
+
+    } catch(error) {
+
+        commands.clean();
+
+        manager.task('Downloading Wordpress files', function() {
+            if (!project.wordpress.version) {
+                manager.wp('core download --locale=fr_FR');
+            } else {
+                manager.wp('core download --locale=fr_FR --version=' + project.wordpress.version);
+            }
+        });
+
+        manager.task('Configuring Wordpress', function() {
+            manager.wp('core config --dbname="' + project.database + '"');
+        });
+
+        manager.task('Creating the database', function() {
+            manager.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
+        });
+
+        manager.task('Installing Wordpress', function() {
+            manager.wp('core install --title="' + project.title + '"');
+        });
+
+        manager.task('Managing plugins', function() {
+            manager.wpPlugins().forEach(function(plugin) {
+                manager.wp('plugin uninstall ' + plugin.name);
+            });
+
+            Object.keys(project.wordpress.plugins).forEach(function(name) {
+                var version = project.wordpress.plugins[name];
+
+                if (!version) {
+                    manager.wp('plugin install ' + name + ' --activate');
+                } else {
+                    manager.wp('plugin install ' + name + ' --version=' + version + ' --activate');
+                }
+            });
+        });
+
+        manager.task('Managing themes', function() {
+            manager.wp('theme activate project-theme');
+            manager.wp('theme delete twentythirteen twentyfourteen twentyfifteen');
+        });
+
+        manager.task('Configuring rewriting rules', function() {
+            manager.wp('rewrite structure "/%postname%/" --hard');
+        });
+
+        manager.task(
+            'Adding ' + chalk.magenta('wp-cli.yml') + ' to the ' + chalk.magenta('public/') + ' folder',
+            function() {
+                manager.writeFile(WP_ROOT + '/wp-cli.yml', '');
+            }
+        );
+
+        manager.task('Saving dependencies versions', function() {
+            project.wordpress.version = manager.wp('core version').trim();
+
+            manager.wpPlugins().forEach(function(plugin) {
+                project.wordpress.plugins[plugin.name] = plugin.version;
+            });
+
+            manager.writeFile('wp-project.json', JSON.stringify(project, null, 4));
+        }, ['prod', 'dev']);
+
+        manager.task('Removing the "origin" git remote', function() {
+            manager.exec('git remote remove origin');
+        }, ['prod', 'dev']);
+
+        manager.task('Commiting the new Wordpress install', function() {
+            manager.exec('git add -A');
+            manager.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+        }, ['prod', 'dev']);
+
+        if (!manager.errorsOccured) {
+            console.log('\n' + chalk.green('Success:') + ' Everything went better than expected!');
+        } else {
+            console.log([
+                '\n' + chalk.red('Error:'),
+                'Some errors occured during the installation. Check if all the dependencies are installed and if your',
+                'MySQL server is running. Next, run ' + chalk.yellow('npm run wp-clean') + ' and',
+                chalk.yellow('npm run wp-clean') + '.'
+            ].join(' '));
+        }
+
+    }
+
+};
+
+commands.serve = function() {
+
+    shell.cd(WP_ROOT);
 
     // Use the spawn method to preserve colors in the console
     spawn('wp', ['server'], {stdio: 'inherit'});
@@ -132,7 +208,8 @@ tasks.serve = function() {
 };
 
 /*
- * Run request task
+ * Run the requested command
  */
 
-tasks[argv._[0]]();
+console.log(chalk.blue('WP_BOILERPLATE_ENV') + ' = ' + chalk.cyan(ENV) + '\n');
+commands[argv._[0]]();

@@ -59,14 +59,20 @@ If the installation failed for any reason, just run `npm run wp-clean` to rollba
 
 To run a local server, use `npm run wp-serve`.
 
-To watch for your assets modifications, run `npm run watch`.
+To watch for your assets modifications, use `npm run watch`.
 
 ## Contribute
 
 Clone the repository and add this line to your `~/.profile`:
 
 ```shell
-export WP_BOILERPLATE_ENV="dev"
+export WP_BOILERPLATE_ENV="contrib"
 ```
 
-This will bypass any Git alterations when running the `npm run wp-install` command. If you occasionally want to revert back to the default environment, use `npm run wp-install -- --skip-env-check`.
+This will bypass the following tasks when running the `npm run wp-install` command:
+
+* Saving dependencies versions
+* Removing the "origin" git remote
+* Commiting the new Wordpress install
+
+If you occasionally want to revert back to the default environment, use `npm run wp-install -- --skip-env-check`.
