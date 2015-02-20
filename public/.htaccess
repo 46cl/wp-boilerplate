@@ -1,1 +1,6 @@
+# Suport WebM's MIME type
 AddType video/webm .webm
+
+# Set post and upload size limits
+php_value post_max_size 5M
+php_value upload_max_filesize 5M
