@@ -4,6 +4,7 @@ apache_modules:
 core config:
     dbuser: root
     dbpass:
+    dbhost: 127.0.0.1
     extra-php: |
         /** Avoid any file modifications by the users */
         define('DISALLOW_FILE_MODS', true);
