@@ -83,6 +83,6 @@ gulp.task('watch', function(cb) {
 
     watcher.on('change', function(event) {
         var type = event.type.toUpperCase().slice(0, 1) + event.type.toLowerCase().slice(1);
-        console.log('\n' + chalk.yellow(type) + ': ' + chalk.magenta(event.path) + '\n');
+        console.log('\n' + chalk.yellow(type + ': ') + chalk.magenta(event.path) + '\n');
     });
 });

@@ -71,8 +71,8 @@ export WP_BOILERPLATE_ENV="contrib"
 
 This will bypass the following tasks when running the `npm run wp-install` command:
 
+* Renaming the project theme
 * Saving dependencies versions
-* Removing the "origin" git remote
-* Commiting the new Wordpress install
+* Reinitializing the Git project
 
 If you occasionally want to revert back to the default environment, use `npm run wp-install -- --skip-env-check`.

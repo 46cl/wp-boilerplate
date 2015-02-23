@@ -9,7 +9,7 @@ var project = require('./wp-project.json');
 var argv = require('yargs').argv,
     chalk = require('chalk'),
     fs = require('fs'),
-    gulp = require('gulp'),
+    rimraf = require('rimraf'),
     shell = require('shelljs'),
     spawn = require('child_process').spawn;
 
@@ -32,30 +32,67 @@ var manager = {
 
     errorsOccured: false,
 
+    /**
+     * Checks if the current environment doesn't match the provided ones.
+     * @param  {string[]|function[]} envs An array composed of strings of environments ("prod", "dev", "contrib") and/or
+     * of functions returning a message when an environment criteria isn't met.
+     * @return {boolean|string}           Returns a value different from `false` if the current environment doesn't
+     * match the provided ones.
+     */
+    envDoesntMatch: function(envs) {
+        if (!envs) {
+            return false;
+        }
+
+        var containsStrings = false;
+        envs.forEach(function(env) {
+            containsStrings = containsStrings || typeof env == 'string';
+        });
+
+        var result = false;
+
+        envs.filter(function(env) {
+            return typeof env == 'function';
+        }).forEach(function(env) {
+            result = result || env();
+        });
+
+        if (containsStrings && envs.indexOf(ENV) == -1) {
+            var envsOutput = envs.filter(function(env) {
+                return typeof env == 'string';
+            }).map(function(env) {
+                return chalk.cyan(env);
+            }).join(', ');
+
+            result = result || 'Requires one of the following environments: ' + envsOutput;
+        }
+
+        return result;
+    },
+
     // Executes a new task
     task: function(message, execTask, envs) {
         process.stdout.write(chalk.yellow('Running: ') + message + '... ');
 
-        if (!envs || envs.indexOf(ENV) != -1) {
+        var bypassingMessage = this.envDoesntMatch(envs);
+
+        if (!bypassingMessage) {
             try {
                 execTask();
                 console.log(chalk.green('Success'));
             } catch(error) {
                 this.errorsOccured = true;
-                console.log(chalk.red('Error: ') + error.trim().replace(/[\n\r]/g, ' '));
+                error = error.toString().trim().replace(/Error: /g, '').replace(/[\n\r]/g, ' ');
+                console.log(chalk.red('Error: ') + error);
             }
         } else {
-            var envsOutput = envs.map(function(env) {
-                return chalk.cyan(env);
-            }).join(', ');
-
-            console.log(chalk.yellow('Bypassed:') + ' Requires one of the following environments: ' + envsOutput);
+            console.log(chalk.yellow('Bypassed: ') + bypassingMessage);
         }
     },
 
     // Runs a command
     exec: function(command) {
-        var result = shell.exec(command, {silent: true});
+        var result = shell.exec(command);
 
         if (result.code) {
             throw new Error(result.output);
@@ -82,6 +119,9 @@ var manager = {
 
 };
 
+// Set shelljs as silent
+shell.config.silent = true;
+
 /*
  * Commands
  */
@@ -103,97 +143,135 @@ commands.clean = function() {
 
 commands.install = function() {
 
-    try {
+    /*
+     * Custom environments
+     */
 
-        manager.wp('core is-installed');
-        console.log(chalk.yellow('Cancelled:') + ' Wordpress seems already installed');
+    // No project is initialized
+    var notInitializedEnv = function() {
+        return project.wordpress.version != null
+             ? 'The project is already initialized'
+             : false;
+    };
 
-    } catch(error) {
+    // The project is not installed
+    var notInstalledEnv = (function() {
+        var result = 'The project is already installed';
 
-        commands.clean();
-
-        manager.task('Downloading Wordpress files', function() {
-            if (!project.wordpress.version) {
-                manager.wp('core download --locale=fr_FR');
-            } else {
-                manager.wp('core download --locale=fr_FR --version=' + project.wordpress.version);
-            }
-        });
-
-        manager.task('Configuring Wordpress', function() {
-            manager.wp('core config --dbname="' + project.database + '"');
-        });
-
-        manager.task('Creating the database', function() {
-            manager.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
-        });
-
-        manager.task('Installing Wordpress', function() {
-            manager.wp('core install --title="' + project.title + '"');
-        });
-
-        manager.task('Managing plugins', function() {
-            manager.wpPlugins().forEach(function(plugin) {
-                manager.wp('plugin uninstall ' + plugin.name);
-            });
-
-            Object.keys(project.wordpress.plugins).forEach(function(name) {
-                var version = project.wordpress.plugins[name];
-
-                if (!version) {
-                    manager.wp('plugin install ' + name + ' --activate');
-                } else {
-                    manager.wp('plugin install ' + name + ' --version=' + version + ' --activate');
-                }
-            });
-        });
-
-        manager.task('Managing themes', function() {
-            manager.wp('theme activate project-theme');
-            manager.wp('theme delete twentythirteen twentyfourteen twentyfifteen');
-        });
-
-        manager.task('Configuring rewriting rules', function() {
-            manager.wp('rewrite structure "/%postname%/" --hard');
-        });
-
-        manager.task(
-            'Adding ' + chalk.magenta('wp-cli.yml') + ' to the ' + chalk.magenta('public/') + ' folder',
-            function() {
-                manager.writeFile(WP_ROOT + '/wp-cli.yml', '');
-            }
-        );
-
-        manager.task('Saving dependencies versions', function() {
-            project.wordpress.version = manager.wp('core version').trim();
-
-            manager.wpPlugins().forEach(function(plugin) {
-                project.wordpress.plugins[plugin.name] = plugin.version;
-            });
-
-            manager.writeFile('wp-project.json', JSON.stringify(project, null, 4));
-        }, ['prod', 'dev']);
-
-        manager.task('Removing the "origin" git remote', function() {
-            manager.exec('git remote remove origin');
-        }, ['prod', 'dev']);
-
-        manager.task('Commiting the new Wordpress install', function() {
-            manager.exec('git add -A');
-            manager.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
-        }, ['prod', 'dev']);
-
-        if (!manager.errorsOccured) {
-            console.log('\n' + chalk.green('Success:') + ' Everything went better than expected!');
-        } else {
-            console.log([
-                '\n' + chalk.red('Error:'),
-                'Some errors occured during the installation. Check if all the dependencies are installed and if your',
-                'MySQL server is running. Next, run ' + chalk.yellow('npm run wp-clean') + ' and',
-                chalk.yellow('npm run wp-clean') + '.'
-            ].join(' '));
+        try {
+            manager.wp('core is-installed');
+        } catch(error) {
+            result = false;
         }
 
+        return function() {
+            return result;
+        };
+    })();
+
+    /*
+     * Tasks
+     */
+
+    manager.task('Downloading Wordpress files', function() {
+        if (!project.wordpress.version) {
+            manager.wp('core download --locale=fr_FR');
+        } else {
+            manager.wp('core download --locale=fr_FR --version=' + project.wordpress.version);
+        }
+    }, [notInstalledEnv]);
+
+    manager.task('Configuring Wordpress', function() {
+        manager.wp('core config --dbname="' + project.database + '"');
+    }, [notInstalledEnv]);
+
+    manager.task('Creating the database', function() {
+        manager.exec('mysql -u root -e "create database \\`' + project.database + '\\`;"');
+    }, [notInstalledEnv]);
+
+    manager.task('Installing Wordpress', function() {
+        manager.wp('core install --title="' + project.title + '"');
+    }, [notInstalledEnv]);
+
+    manager.task('Managing plugins', function() {
+        manager.wpPlugins().forEach(function(plugin) {
+            manager.wp('plugin uninstall ' + plugin.name);
+        });
+
+        Object.keys(project.wordpress.plugins).forEach(function(name) {
+            var version = project.wordpress.plugins[name];
+
+            if (!version) {
+                manager.wp('plugin install ' + name + ' --activate');
+            } else {
+                manager.wp('plugin install ' + name + ' --version=' + version + ' --activate');
+            }
+        });
+    });
+
+    manager.task('Renaming the project theme', function() {
+        var themesPath = 'public/wp-content/themes/';
+
+        manager.writeFile(themesPath + 'project-theme/style.css', [
+            '/*',
+            'Theme Name: ' + project.title,
+            '*/\n'
+        ].join('\n'));
+
+        if (fs.renameSync(themesPath + 'project-theme', themesPath + project.slug)) {
+            throw new Error("The theme directory cannot be renamed...");
+        }
+    }, ['prod', 'dev', notInitializedEnv]);
+
+    manager.task('Managing themes', function() {
+        var themeName = manager.envDoesntMatch(['prod', 'dev']) ? 'project-theme' : project.slug;
+
+        manager.wp('theme activate ' + themeName);
+        manager.wp('theme delete twentythirteen twentyfourteen twentyfifteen');
+    });
+
+    manager.task('Configuring rewriting rules', function() {
+        manager.wp('rewrite structure "/%postname%/" --hard');
+    });
+
+    manager.task(
+        'Adding ' + chalk.magenta('wp-cli.yml') + ' to the ' + chalk.magenta('public/') + ' folder',
+        function() {
+            manager.writeFile(WP_ROOT + '/wp-cli.yml', '');
+        }
+    );
+
+    manager.task('Saving dependencies versions', function() {
+        project.wordpress.version = manager.wp('core version').trim();
+
+        manager.wpPlugins().forEach(function(plugin) {
+            project.wordpress.plugins[plugin.name] = plugin.version;
+        });
+
+        manager.writeFile('wp-project.json', JSON.stringify(project, null, 4));
+    }, ['prod', 'dev', notInitializedEnv]);
+
+    manager.task('Reinitializing the Git project', function() {
+        rimraf.sync('.git');
+
+        manager.exec('git init');
+        manager.exec('git add -A');
+        manager.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+    }, ['prod', 'dev', notInitializedEnv]);
+
+    /*
+     * Final state
+     */
+
+    if (!manager.errorsOccured) {
+        console.log('\n' + chalk.green('Success:') + ' Everything went better than expected!');
+    } else {
+        console.log([
+            '\n' + chalk.red('Error:'),
+            'Some errors occured during the installation. Check if all the dependencies are installed and if your',
+            'MySQL server is running. Next, run ' + chalk.yellow('npm run wp-clean') + ' and',
+            chalk.yellow('npm run wp-clean') + '.'
+        ].join(' '));
     }
 
 };
