@@ -13,7 +13,9 @@ var chalk = require('chalk'),
 var concat = require('gulp-concat'),
     gutil = require('gulp-util'),
     less = require('gulp-less'),
+    minifyCss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
+    sourcemaps = require('gulp-sourcemaps'),
     uglify = require('gulp-uglify');
 
 /*
@@ -21,11 +23,14 @@ var concat = require('gulp-concat'),
  */
 
 function path(path) {
-    return path.replace(/%theme_path%/g, 'public/wp-content/themes/project-theme');
+    return path.replace(
+        /%theme_path%/g,
+        'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
+    );
 }
 
 function error(error) {
-    console.log(chalk.red('\n' + error.message + '\n'));
+    console.log('\n' + chalk.red('Error: ') + error.message + '\n');
     this.emit('end');
 }
 
@@ -36,9 +41,16 @@ function error(error) {
 function stylesheetsTransformer(src, isVendor) {
 
     return gulp.src(path(src))
+        .pipe(sourcemaps.init())
         .pipe(!isVendor ? gutil.noop() : concat('vendor.css'))
-        .pipe(less({ compress: true }).on('error', error))
+        .pipe(!isVendor ? less().on('error', error) : gutil.noop())
+        .pipe(minifyCss({
+            compatibility: 'ie8',
+            keepSpecialComments: 0,
+            roundingPrecision: 4
+        }).on('error', error))
         .pipe(!isVendor ? rename({extname: '.css'}) : gutil.noop())
+        .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(path(paths.dest.stylesheets)));
 
 }
@@ -46,8 +58,10 @@ function stylesheetsTransformer(src, isVendor) {
 function scriptsTransformer(src, isVendor) {
 
     return gulp.src(path(src))
+        .pipe(sourcemaps.init())
         .pipe(concat(!isVendor ? 'app.js' : 'vendor.js'))
         .pipe(uglify().on('error', error))
+        .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(path(paths.dest.scripts)));
 
 }
