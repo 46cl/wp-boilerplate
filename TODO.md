@@ -1,0 +1,13 @@
+- [ ] Add a script to import the DB and the uploaded files of another Wordpress installation
+- [ ] Simplify the way meta boxes can be added
+- [ ] Add the `404` and `500` templates
+- [ ] Handle files other than images with upload boxes
+- [ ] Add a `wysiwyg` input type for sequential boxes
+- [ ] Fix visual bugs with sequential boxes on mobile
+- [ ] Add a message for IE8- users, asking them to upgrade to a recent browser
+- [ ] Hide the `Settings->Media` page by default
+- [ ] Add a `Config` class to easily enable or disable some WP features (eg: comments)
+- [ ] Create a simple method to set a favicon for the front AND the admin
+- [ ] Allow to easily manage colors (and other features) in the WP editor
+- [ ] Handle images loaded through a CDN
+- [ ] Export the "Boxes" class in an individual plugin
