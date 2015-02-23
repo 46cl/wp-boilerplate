@@ -22,11 +22,22 @@ var concat = require('gulp-concat'),
  * Helpers
  */
 
-function path(path) {
-    return path.replace(
-        /%theme_path%/g,
-        'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
-    );
+// Replaces "%theme_path%" by the real path
+function path(paths) {
+
+    var replaceThemePath = function(path) {
+        return path.replace(
+            /%theme_path%/g,
+            'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
+        );
+    };
+
+    if (Array.isArray(paths)) {
+        return paths.map(replaceThemePath);
+    } else {
+        return replaceThemePath(paths);
+    }
+
 }
 
 function error(error) {
