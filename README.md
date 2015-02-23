@@ -61,6 +61,10 @@ To run a local server, use `npm run wp-serve`.
 
 To watch for your assets modifications, use `npm run watch`.
 
+## Theme configuration
+
+In the configuration file of the theme (`config/theme.php`), you can define versions for your assets. Those will be used by the `asset` Twig filter, see the `views/layout.twig` file for an usage example of this filter.
+
 ## Contribute
 
 Clone the repository and add this line to your `~/.profile`:

@@ -6,8 +6,8 @@
 
     {{ wp_head }}
 
-    <link rel="stylesheet" href="{{ theme.link }}/assets/vendor.css">
-    <link rel="stylesheet" href="{{ theme.link }}/assets/app.css">
+    <link rel="stylesheet" href="{{ 'vendor.css'|asset('vendor') }}">
+    <link rel="stylesheet" href="{{ 'app.css'|asset('app') }}">
 </head>
 <body>
 
@@ -16,8 +16,8 @@
     {{ wp_footer }}
 
     {# If you add dependencies in the vendor scripts, uncomment the line below. #}
-    {# <script src="{{ theme.link }}/assets/vendor.js"></script> #}
-    <script src="{{ theme.link }}/assets/app.js"></script>
+    {# <script src="{{ 'vendor.js'|asset('vendor') }}"></script> #}
+    <script src="{{ 'app.js'|asset('app') }}"></script>
 
 </body>
 </html>
