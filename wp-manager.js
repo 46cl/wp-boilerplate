@@ -148,11 +148,15 @@ commands.install = function() {
      */
 
     // No project is initialized
-    var notInitializedEnv = function() {
-        return project.wordpress.version != null
+    var notInitializedEnv = (function() {
+        var result = project.wordpress.version != null
              ? 'The project is already initialized'
              : false;
-    };
+
+        return function() {
+            return result;
+        };
+    })();
 
     // The project is not installed
     var notInstalledEnv = (function() {
