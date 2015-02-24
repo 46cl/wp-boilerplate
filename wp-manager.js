@@ -17,7 +17,7 @@ var argv = require('yargs').argv,
  * Constants
  */
 
-var WP_BOILERPLATE_ENV = process.env.WP_BOILERPLATE_ENV.toLowerCase();
+var WP_BOILERPLATE_ENV = (process.env.WP_BOILERPLATE_ENV || '').toLowerCase();
 
 var WP_ROOT = 'public',
     ENV = !argv.skipEnvCheck && ['prod', 'dev', 'contrib'].indexOf(WP_BOILERPLATE_ENV) != -1
