@@ -19,7 +19,11 @@
             },
 
             "app": {
-                "stylesheets": "%theme_path%/app/stylesheets/app.less",
+                "stylesheets": [
+                    "%theme_path%/app/stylesheets/app.less",
+                    "%theme_path%/app/stylesheets/admin.less",
+                    "%theme_path%/app/stylesheets/editor.less"
+                ],
                 "scripts": "%theme_path%/app/scripts/*"
             }
         },

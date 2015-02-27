@@ -60,7 +60,7 @@ function stylesheetsTransformer(src, isVendor) {
             keepSpecialComments: 0,
             roundingPrecision: 4
         }).on('error', error))
-        .pipe(!isVendor ? rename({extname: '.css'}) : gutil.noop())
+        .pipe(rename({extname: '.css'}))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(path(paths.dest.stylesheets)));
 
