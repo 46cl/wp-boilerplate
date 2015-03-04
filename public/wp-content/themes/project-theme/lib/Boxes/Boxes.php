@@ -4,6 +4,7 @@ class Boxes implements LoaderInterface
 {
 
     static private $renderedOnce = false;
+    static private $originalDirname;
 
     static public function load()
     {
@@ -113,7 +114,7 @@ class Boxes implements LoaderInterface
     static private function init()
     {
         // Change the views directory
-        $originalDirname = Timber::$dirname;
+        self::$originalDirname = Timber::$dirname;
         Timber::$dirname = 'lib/Boxes/views';
 
         // First rendering, load Angular templates.
@@ -126,7 +127,7 @@ class Boxes implements LoaderInterface
     static private function destroy()
     {
         // Revert to the original views directory
-        Timber::$dirname = $originalDirname;
+        Timber::$dirname = self::$originalDirname;
     }
 
 }
