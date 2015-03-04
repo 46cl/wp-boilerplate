@@ -1,13 +1,3 @@
-<!-- Upload button -->
-
-<script type="text/ng-template" id="upload-box.html">
-    <div ng-click="openModal()" class="upload-box">
-        <input ng-if="!binded" type="hidden" name="(( name ))" value="(( image | json ))">
-        <img ng-show="image" ng-src="(( image.url ))">
-        <input ng-hide="image" class="button" type="button" value="(( label ))">
-    </div>
-</script>
-
 <!-- Sequential boxes: core -->
 
 <script type="text/ng-template" id="sequential-boxes.html">
@@ -19,9 +9,7 @@
                 <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
             </div>
 
-            <div class="text-center">
-                <input ng-click="remove(dataSet)" class="button" type="button" value="Supprimer">
-            </div>
+            <input ng-click="remove(dataSet)" class="button button-delete" type="button" value="Supprimer">
         </div>
     </div>
 
@@ -29,10 +17,6 @@
 </script>
 
 <!-- Sequential boxes: fields -->
-
-<script type="text/ng-template" id="field-upload.html">
-    <upload-box label="(( field.label ))" ng-model="dataSet[field.name]"></upload-box>
-</script>
 
 <script type="text/ng-template" id="field-text.html">
     <label>
@@ -46,4 +30,37 @@
         <strong>(( field.label ))</strong> <br>
         <textarea ng-model="dataSet[field.name]"></textarea>
     </label>
+</script>
+
+<script type="text/ng-template" id="field-upload.html">
+    <upload-box label="(( field.label ))" ng-model="dataSet[field.name]"></upload-box>
+</script>
+
+<script type="text/ng-template" id="field-post.html">
+    <post-box label="(( field.label ))" ng-model="dataSet[field.name]"></post-box>
+</script>
+
+<!-- Upload button -->
+
+<script type="text/ng-template" id="upload-box.html">
+    <div ng-click="openModal()" class="upload-box">
+        <input ng-if="!binded" type="hidden" name="(( name ))" value="(( image | json ))">
+        <img ng-show="image" ng-src="(( image.url ))">
+        <input ng-hide="image" class="button" type="button" value="(( label ))">
+    </div>
+</script>
+
+<!-- Post selector -->
+
+<script type="text/ng-template" id="post-box.html">
+    <div ng-click="modal.open()" ng-class="{'post-box-loading': loading}" class="post-box">
+        <span class="spinner"></span>
+        <input ng-if="!binded" type="hidden" name="(( name ))" value="(( post.id ))">
+
+        <span ng-if="post.title" class="post-box-title">(( post.title )) <br></span>
+        <input class="button" type="button" value="(( label ))">
+
+        <!-- The wpLink API always needs an input to output the link -->
+        <input ng-attr-id="(( inputId ))" type="text">
+    </div>
 </script>

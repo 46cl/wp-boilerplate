@@ -7,14 +7,14 @@ class Boxes implements LoaderInterface
 
     static public function load()
     {
+        // Enqueue the assets required by the class
         add_action('admin_enqueue_scripts', function() {
-            $base = get_stylesheet_directory_uri() . '/lib/' . basename(__DIR__);
+            self::enqueueAssets();
+        });
 
-            wp_enqueue_style('boxes-admin', $base . '/stylesheets/boxes.css');
-
-            wp_enqueue_script('boxes-angular', '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js');
-            wp_enqueue_script('boxes-ui-sortable', '//cdnjs.cloudflare.com/ajax/libs/angular-ui-sortable/0.13.3/sortable.min.js');
-            wp_enqueue_script('boxes-admin', $base . '/scripts/boxes.js');
+        // Register API endpoints
+        add_action('wp_ajax_post_box', function() {
+            self::postAjax();
         });
     }
 
@@ -44,11 +44,72 @@ class Boxes implements LoaderInterface
         self::destroy();
     }
 
+    static public function post($label, $name, $data)
+    {
+        self::init();
+
+        Timber::render('boxes/post.twig', array(
+            'label' => $label,
+            'name' => $name,
+            'data' => $data
+        ));
+
+        self::destroy();
+    }
+
+    static private function postAjax()
+    {
+        $response = null;
+        $id = wp_unslash($_POST['id']);
+        $permalink = wp_unslash($_POST['permalink']);
+
+        if (!empty($id) || !empty($permalink)) {
+            $query = array(
+                'post_type' => 'any',
+                'nopaging' => true
+            );
+
+            if (!empty($id)) {
+                $query['p'] = intval($id);
+            }
+
+            $posts = get_posts($query);
+
+            if (!empty($permalink)) {
+                $posts = array_filter($posts, function($post) use ($permalink) {
+                    return get_permalink($post->ID) == $permalink;
+                });
+
+                $posts = array_values($posts);
+            }
+
+            header('Content-type: application/json');
+
+            $response = array(
+                'id' => $posts[0]->ID,
+                'title' => $posts[0]->post_title
+            );
+        }
+
+        die(json_encode($response));
+    }
+
+    static private function enqueueAssets()
+    {
+        $base = get_stylesheet_directory_uri() . '/lib/' . basename(__DIR__);
+
+        wp_enqueue_style('boxes-admin', $base . '/stylesheets/boxes.css');
+
+        wp_enqueue_script('boxes-angular', '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js');
+        wp_enqueue_script('boxes-ui-sortable', '//cdnjs.cloudflare.com/ajax/libs/angular-ui-sortable/0.13.3/sortable.min.js');
+        wp_enqueue_script('boxes-admin', $base . '/scripts/boxes.js');
+    }
+
     static private function init()
     {
         // Change the views directory
         $originalDirname = Timber::$dirname;
-        Timber::$dirname = 'lib/boxes/views';
+        Timber::$dirname = 'lib/Boxes/views';
 
         // First rendering, load Angular templates.
         if (!self::$renderedOnce) {

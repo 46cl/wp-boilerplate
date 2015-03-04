@@ -6,8 +6,19 @@ jQuery(function() {
 
     angular.module('wp-admin', ['ui.sortable'])
 
-    .config(['$interpolateProvider', function($interpolateProvider) {
-        $interpolateProvider.startSymbol('((').endSymbol('))'); // Avoid Twig conflicts
+    .config(['$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider) {
+        // Avoid Twig conflicts
+        $interpolateProvider.startSymbol('((').endSymbol('))');
+
+        // Post data as form data
+        $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+        $httpProvider.defaults.transformRequest = function(obj) {
+            var encodedStr = [];
+            $.each(obj || {}, function(key, value) {
+                encodedStr.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+            });
+            return encodedStr.join('&');
+        };
     }])
 
     /*
@@ -122,6 +133,144 @@ jQuery(function() {
                 name: '@'
             },
             templateUrl: 'upload-box.html',
+            link: link
+        };
+
+    }])
+
+    /*
+     * Post box
+     */
+
+    .directive('postBox', ['$rootScope', '$http', function($rootScope, $http) {
+
+        var lastInputId = 0;
+
+        // Alter the wpLink API to intercept the `close` and `update` “events”
+        ['update', 'close'].forEach(function(eventName) {
+            wpLink[eventName] = (function(eventCallback) {
+                return function() {
+                    $rootScope.$emit('postBox:' + eventName);
+                    eventCallback();
+                };
+            })(wpLink[eventName]);
+        });
+
+        function link(scope, element, attrs, NgModelCtrl) {
+
+            scope.binded = angular.isDefined(attrs.ngModel);;
+            scope.inputId = 'post-box-' + lastInputId++;
+
+            // Create a wrapper to manage the wpLink modal
+            scope.modal = {
+
+                $modal: $('#wp-link-wrap'),
+                $title: $('#wp-link-wrap #link-modal-title').contents()[0],
+                $search: $('#wp-link-wrap #search-field'),
+                $submit: $('#wp-link-wrap #wp-link-submit'),
+
+                opened: false,
+
+                open: function() {
+                    this.opened = true;
+
+                    this.originalStates = {
+                        searchPanelWasVisible: this.$modal.hasClass('search-panel-visible'),
+                        title: this.$title.textContent,
+                        submit: this.$submit.val()
+                    };
+
+                    this.$modal.addClass('search-panel-visible post-box-modal');
+                    wpLink.open(scope.inputId);
+
+                    this.$title.textContent = scope.label;
+                    this.$submit.val('Valider');
+                    this.$search.focus();
+                },
+
+                update: function() {
+                    if (!this.opened) {
+                        return;
+                    }
+
+                    scope.loading = true;
+
+                    var formPost = wpLink.getAttrs();
+
+                    // Retrieve the ID of the post using the native Wordpress search endpoint
+                    $http.post('/wp-admin/admin-ajax.php', {
+                        action: 'post_box',
+                        permalink: formPost.href
+                    }).success(function(post) {
+                        scope.post = post;
+
+                        if (scope.binded) {
+                            NgModelCtrl.$setViewValue(post.id);
+                        }
+
+                        scope.loading = false;
+                    });
+                },
+
+                close: function() {
+                    if (!this.opened) {
+                        return;
+                    }
+
+                    this.opened = false;
+
+                    this.$modal.toggleClass('search-panel-visible', this.originalStates.searchPanelWasVisible)
+                               .removeClass('post-box-modal');
+
+                    this.$title.textContent = this.originalStates.title;
+                    this.$submit.val(this.originalStates.submit);
+                }
+
+            };
+
+            // Retrieve the current data
+            function postFromId(id) {
+                if (typeof id != 'number' && (typeof id != 'string' || id.length == 0)) {
+                    return;
+                }
+
+                scope.loading = true;
+
+                $http.post('/wp-admin/admin-ajax.php', {
+                    action: 'post_box',
+                    id: id
+                }).success(function(post) {
+                    scope.post = post;
+                    scope.loading = false;
+                });
+            }
+
+            if (scope.binded) {
+                scope.$watch(NgModelCtrl, function() {
+                    postFromId(NgModelCtrl.$modelValue);
+                });
+            } else {
+                postFromId(attrs.value);
+            }
+
+            // Listen to wpLink events
+            ['update', 'close'].forEach(function(eventName) {
+                $rootScope.$on('postBox:' + eventName, function() {
+                    scope.modal[eventName]();
+                });
+            });
+
+        }
+
+        return {
+            restrict: 'E',
+            replace: true,
+            require: '?ngModel',
+            scope: {
+                label: '@',
+                name: '@'
+            },
+            templateUrl: 'post-box.html',
             link: link
         };
 
