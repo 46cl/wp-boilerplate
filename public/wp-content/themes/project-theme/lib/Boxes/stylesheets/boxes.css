@@ -201,10 +201,6 @@
     display: none;
 }
 
-.post-box.without-label .post-box-title {
-    margin-top: 0;
-}
-
 .post-box.without-label .button-icon {
     margin-top: -4px;
 }

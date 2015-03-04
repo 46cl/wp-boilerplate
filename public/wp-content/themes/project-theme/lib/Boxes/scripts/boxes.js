@@ -25,7 +25,23 @@ jQuery(function() {
      * Sequential boxes
      */
 
-    .directive('sequentialBoxes', [function() {
+    .factory('$sequentialBoxes', function() {
+        var itemJustAdded = false;
+
+        return {
+            get itemJustAdded() {
+                var cache = itemJustAdded;
+                itemJustAdded = false;
+                return cache;
+            },
+
+            set itemJustAdded(value) {
+                itemJustAdded = value;
+            }
+        };
+    })
+
+    .directive('sequentialBoxes', ['$sequentialBoxes', function($sequentialBoxes) {
 
         function link(scope) {
 
@@ -38,6 +54,7 @@ jQuery(function() {
             } catch(e) {}
 
             scope.add = function() {
+                $sequentialBoxes.itemJustAdded = true;
                 scope.data.push({});
             };
 
@@ -66,7 +83,7 @@ jQuery(function() {
      * Upload box
      */
 
-    .directive('uploadBox', [function() {
+    .directive('uploadBox', ['$timeout', '$sequentialBoxes', function($timeout, $sequentialBoxes) {
 
         function newFrame(callback) {
             var frame = wp.media({
@@ -106,7 +123,8 @@ jQuery(function() {
 
             // Manage options
             scope.options = {
-                'label': 'Ajouter une image'
+                label: 'Ajouter une image',
+                openModalOnAddition: false
             };
 
             try {
@@ -127,10 +145,17 @@ jQuery(function() {
                 }
             }
 
+            // Create a function to open a new modal
             scope.openModal = function() {
                 scope.frame = scope.frame || newFrame(select);
                 scope.frame.open();
             };
+
+            if (scope.options.openModalOnAddition && $sequentialBoxes.itemJustAdded) {
+                $timeout(function() {
+                    scope.openModal();
+                });
+            }
 
         }
 
@@ -151,148 +176,158 @@ jQuery(function() {
      * Post box
      */
 
-    .directive('postBox', ['$rootScope', '$http', '$timeout', function($rootScope, $http, $timeout) {
+    .directive('postBox', [
+        '$rootScope', '$http', '$timeout', '$sequentialBoxes',
+        function($rootScope, $http, $timeout, $sequentialBoxes) {
 
-        var lastInputId = 0;
+            var lastInputId = 0;
 
-        // Alter the wpLink API to intercept the `close` and `update` “events”
-        ['update', 'close'].forEach(function(eventName) {
-            wpLink[eventName] = (function(eventCallback) {
-                return function() {
-                    $rootScope.$emit('postBox:' + eventName);
-                    eventCallback();
-                };
-            })(wpLink[eventName]);
-        });
-
-        function link(scope, element, attrs, NgModelCtrl) {
-
-            scope.binded = angular.isDefined(attrs.ngModel);;
-            scope.inputId = 'post-box-' + lastInputId++;
-
-            // Manage options
-            scope.options = {
-                'hideLabel': false,
-                'label': 'Sélectionner un contenu'
-            };
-
-            try {
-                scope.options = $.extend(scope.options, JSON.parse(attrs.options));
-            } catch(e) {}
-
-            // Create a wrapper to manage the wpLink modal
-            scope.modal = {
-
-                $modal: $('#wp-link-wrap'),
-                $title: $('#wp-link-wrap #link-modal-title').contents()[0],
-                $search: $('#wp-link-wrap #search-field'),
-                $submit: $('#wp-link-wrap #wp-link-submit'),
-
-                opened: false,
-
-                open: function() {
-                    this.opened = true;
-
-                    this.originalStates = {
-                        searchPanelWasVisible: this.$modal.hasClass('search-panel-visible'),
-                        title: this.$title.textContent,
-                        submit: this.$submit.val()
+            // Alter the wpLink API to intercept the `close` and `update` “events”
+            ['update', 'close'].forEach(function(eventName) {
+                wpLink[eventName] = (function(eventCallback) {
+                    return function() {
+                        $rootScope.$emit('postBox:' + eventName);
+                        eventCallback();
                     };
+                })(wpLink[eventName]);
+            });
 
-                    this.$modal.addClass('search-panel-visible post-box-modal');
-                    wpLink.open(scope.inputId);
+            function link(scope, element, attrs, NgModelCtrl) {
 
-                    this.$title.textContent = scope.options.label;
-                    this.$submit.val('Valider');
-                    this.$search.focus();
-                },
+                scope.binded = angular.isDefined(attrs.ngModel);;
+                scope.inputId = 'post-box-' + lastInputId++;
 
-                update: function() {
-                    if (!this.opened) {
+                // Manage options
+                scope.options = {
+                    label: 'Sélectionner un contenu',
+                    hideLabel: false,
+                    openModalOnAddition: false
+                };
+
+                try {
+                    scope.options = $.extend(scope.options, JSON.parse(attrs.options));
+                } catch(e) {}
+
+                // Create a wrapper to manage the wpLink modal
+                scope.modal = {
+
+                    $modal: $('#wp-link-wrap'),
+                    $title: $('#wp-link-wrap #link-modal-title').contents()[0],
+                    $search: $('#wp-link-wrap #search-field'),
+                    $submit: $('#wp-link-wrap #wp-link-submit'),
+
+                    opened: false,
+
+                    open: function() {
+                        this.opened = true;
+
+                        this.originalStates = {
+                            searchPanelWasVisible: this.$modal.hasClass('search-panel-visible'),
+                            title: this.$title.textContent,
+                            submit: this.$submit.val()
+                        };
+
+                        this.$modal.addClass('search-panel-visible post-box-modal');
+                        wpLink.open(scope.inputId);
+
+                        this.$title.textContent = scope.options.label;
+                        this.$submit.val('Valider');
+                        this.$search.focus();
+                    },
+
+                    update: function() {
+                        if (!this.opened) {
+                            return;
+                        }
+
+                        scope.loading = true;
+
+                        var formPost = wpLink.getAttrs();
+
+                        // Retrieve the ID of the post using the native Wordpress search endpoint
+                        $http.post('/wp-admin/admin-ajax.php', {
+                            action: 'post_box',
+                            permalink: formPost.href
+                        }).success(function(post) {
+                            scope.post = post;
+
+                            if (scope.binded) {
+                                NgModelCtrl.$setViewValue(post.id);
+                            }
+
+                            scope.loading = false;
+                        });
+                    },
+
+                    close: function() {
+                        if (!this.opened) {
+                            return;
+                        }
+
+                        this.opened = false;
+
+                        this.$modal.toggleClass('search-panel-visible', this.originalStates.searchPanelWasVisible)
+                                   .removeClass('post-box-modal');
+
+                        this.$title.textContent = this.originalStates.title;
+                        this.$submit.val(this.originalStates.submit);
+                    }
+
+                };
+
+                // Retrieve the current data
+                function postFromId(id) {
+                    if (typeof id != 'number' && (typeof id != 'string' || id.length == 0)) {
                         return;
                     }
 
                     scope.loading = true;
 
-                    var formPost = wpLink.getAttrs();
-
-                    // Retrieve the ID of the post using the native Wordpress search endpoint
                     $http.post('/wp-admin/admin-ajax.php', {
                         action: 'post_box',
-                        permalink: formPost.href
+                        id: id
                     }).success(function(post) {
                         scope.post = post;
-
-                        if (scope.binded) {
-                            NgModelCtrl.$setViewValue(post.id);
-                        }
-
                         scope.loading = false;
                     });
-                },
-
-                close: function() {
-                    if (!this.opened) {
-                        return;
-                    }
-
-                    this.opened = false;
-
-                    this.$modal.toggleClass('search-panel-visible', this.originalStates.searchPanelWasVisible)
-                               .removeClass('post-box-modal');
-
-                    this.$title.textContent = this.originalStates.title;
-                    this.$submit.val(this.originalStates.submit);
                 }
 
+                if (scope.binded) {
+                    scope.$watch(NgModelCtrl, function() {
+                        postFromId(NgModelCtrl.$modelValue);
+                    });
+                } else {
+                    postFromId(attrs.value);
+                }
+
+                // Listen to wpLink events
+                ['update', 'close'].forEach(function(eventName) {
+                    $rootScope.$on('postBox:' + eventName, function() {
+                        scope.modal[eventName]();
+                    });
+                });
+
+                if (scope.options.openModalOnAddition && $sequentialBoxes.itemJustAdded) {
+                    $timeout(function() {
+                        scope.modal.open();
+                    });
+                }
+
+            }
+
+            return {
+                restrict: 'E',
+                replace: true,
+                require: '?ngModel',
+                scope: {
+                    name: '@'
+                },
+                templateUrl: 'post-box.html',
+                link: link
             };
 
-            // Retrieve the current data
-            function postFromId(id) {
-                if (typeof id != 'number' && (typeof id != 'string' || id.length == 0)) {
-                    return;
-                }
-
-                scope.loading = true;
-
-                $http.post('/wp-admin/admin-ajax.php', {
-                    action: 'post_box',
-                    id: id
-                }).success(function(post) {
-                    scope.post = post;
-                    scope.loading = false;
-                });
-            }
-
-            if (scope.binded) {
-                scope.$watch(NgModelCtrl, function() {
-                    postFromId(NgModelCtrl.$modelValue);
-                });
-            } else {
-                postFromId(attrs.value);
-            }
-
-            // Listen to wpLink events
-            ['update', 'close'].forEach(function(eventName) {
-                $rootScope.$on('postBox:' + eventName, function() {
-                    scope.modal[eventName]();
-                });
-            });
-
         }
-
-        return {
-            restrict: 'E',
-            replace: true,
-            require: '?ngModel',
-            scope: {
-                name: '@'
-            },
-            templateUrl: 'post-box.html',
-            link: link
-        };
-
-    }]);
+    ]);
 
     /*
      * Bootstrapping
