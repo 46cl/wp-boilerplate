@@ -1,15 +1,25 @@
 <!-- Sequential boxes: core -->
 
 <script type="text/ng-template" id="sequential-boxes.html">
-    <input ng-click="add()" class="button" type="button" value="Ajouter">
+    <div class="sequential-boxes">
+        <div ui-sortable ng-model="data">
+            <div ng-repeat="dataSet in data" class="sequential-box">
+                <button ng-click="remove(dataSet)" class="button-icon button-delete" type="button">
+                    <span class="dashicons dashicons-trash"></span>
+                </button>
 
-    <div ui-sortable ng-model="data">
-        <div ng-repeat="dataSet in data" class="sequential-box">
+                <div ng-repeat="field in fields">
+                    <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
+                </div>
+            </div>
+        </div>
+
+        <div ng-click="add()" ng-class="{clear: data.length % 3 == 0}" class="sequential-box sequential-box-add">
             <div ng-repeat="field in fields">
                 <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
             </div>
 
-            <input ng-click="remove(dataSet)" class="button button-delete" type="button" value="Supprimer">
+            <input class="button button-add" type="button" value="Ajouter">
         </div>
     </div>
 
@@ -53,12 +63,24 @@
 <!-- Post selector -->
 
 <script type="text/ng-template" id="post-box.html">
-    <div ng-click="modal.open()" ng-class="{'post-box-loading': loading}" class="post-box">
-        <span class="spinner"></span>
+    <div class="post-box">
         <input ng-if="!binded" type="hidden" name="(( name ))" value="(( post.id ))">
 
-        <span ng-if="post.title" class="post-box-title">(( post.title )) <br></span>
-        <input class="button" type="button" value="(( label ))">
+        <label>
+            <strong>(( label ))</strong> <br>
+
+            <button ng-click="modal.open()" ng-disabled="loading" class="button-icon" type="button">
+                <span class="dashicons dashicons-edit"></span>
+            </button>
+
+            <div ng-class="{'post-box-loading': loading}"
+                 class="post-box-title"
+                 title="(( post.title ))">
+                <span class="spinner"></span>
+                <span ng-if="post.title">(( post.title ))</span>
+                <em ng-if="!post.title">Aucun contenu lié</em>
+            </div>
+        </label>
 
         <!-- The wpLink API always needs an input to output the link -->
         <input ng-attr-id="(( inputId ))" type="text">

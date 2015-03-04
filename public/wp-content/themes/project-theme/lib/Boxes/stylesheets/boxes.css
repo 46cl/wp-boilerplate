@@ -1,15 +1,84 @@
+.button-icon {
+    border-radius: 2px;
+    border: 1px solid transparent;
+    width: 26px; height: 26px;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.button-icon[disabled] {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.button-icon:not([disabled]):hover {
+    border-color: #999;
+    background: #fafafa;
+}
+
+.button-icon .dashicons {
+    position: relative;
+    left: 1px;
+}
+
 /*
  * Sequential boxes
  */
 
+.sequential-boxes::after {
+    display: block;
+    width: 100%;
+    clear: both;
+    content: '';
+}
+
 .sequential-box {
-    vertical-align: middle;
-    display: inline-block;
+    position: relative;
+    float: left;
     margin: 20px 20px 0 0;
-    border: 1px dashed #ccc;
-    min-width: 200px;
+    min-width: 180px;
+    width: calc(100% / 3 - 60px);
     padding: 10px;
+    background: #f7f7f7;
+    font-size: 13px;
+}
+
+.sequential-box:nth-child(3n) {
+    margin-right: 0;
+}
+
+.sequential-box:nth-child(3n+1) {
+    clear: both;
+}
+
+.sequential-box:hover .button-delete {
+    opacity: 1;
+}
+
+.sequential-box.sequential-box-add {
+    cursor: pointer;
+}
+
+.sequential-box.sequential-box-add::before {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 1;
+    border: 1px dashed #ccc;
+    width: 100%; height: 100%;
     background: #fff;
+    content: '';
+}
+
+.sequential-box.sequential-box-add .button-add {
+    position: absolute;
+    top: 50%; left: 50%;
+    z-index: 1;
+    margin-top: -14px;
+
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
 }
 
 .sequential-box .upload-box, .sequential-box label {
@@ -17,8 +86,12 @@
     margin-bottom: 10px;
 }
 
+.sequential-box input[type="text"] {
+    width: 100%;
+}
+
 .sequential-box textarea {
-    width: 400px;
+    width: 100%;
     min-height: 100px;
     resize: vertical;
 }
@@ -32,8 +105,13 @@
 }
 
 .sequential-box .button-delete {
-    display: block;
-    margin: auto;
+    position: absolute;
+    top: -13px; right: -14px;
+    opacity: 0;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 /*
@@ -80,46 +158,41 @@
     top: 38px;
 }
 
-.post-box {
-    position: relative;
-    margin: 20px auto;
-    border: 1px dashed #ccc;
-    max-width: 400px;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
+.post-box-modal #wp-link .query-notice {
+    display: none;
 }
 
 .post-box input[type="text"] {
     display: none;
 }
 
-.post-box .post-box-title {
-    display: inline-block;
-    max-width: 100%;
+.post-box .button-icon {
+    float: right;
+}
+
+.post-box-title {
+    position: relative;
+    margin-top: 4px;
+    padding-right: 4px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 
-.post-box .post-box-title + .button {
-    margin-top: 5px;
-}
-
-.post-box.post-box-loading::before,
-.post-box.post-box-loading .spinner {
+.post-box-loading::before,
+.post-box-loading .spinner {
     position: absolute;
     top: 0; left: 0;
     display: block;
     width: 100%; height: 100%;
 }
 
-.post-box.post-box-loading::before {
-    background: rgba(255, 255, 255, 0.75);
+.post-box-loading::before {
+    background: rgba(247, 247, 247, 0.75);
     content: '';
 }
 
-.post-box.post-box-loading .spinner {
+.post-box-loading .spinner {
     margin: 0;
     background-position: center center;
     opacity: 1;
