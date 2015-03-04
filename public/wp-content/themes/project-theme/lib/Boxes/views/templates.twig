@@ -1,7 +1,7 @@
 <!-- Sequential boxes: core -->
 
 <script type="text/ng-template" id="sequential-boxes.html">
-    <div class="sequential-boxes">
+    <div class="sequential-boxes (( options.layout ))-layout">
         <div ui-sortable ng-model="data">
             <div ng-repeat="dataSet in data" class="sequential-box">
                 <button ng-click="remove(dataSet)" class="button-icon button-delete" type="button">
@@ -19,7 +19,7 @@
                 <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
             </div>
 
-            <input class="button button-add" type="button" value="Ajouter">
+            <button class="button button-add" type="button">Ajouter</button>
         </div>
     </div>
 
@@ -43,11 +43,11 @@
 </script>
 
 <script type="text/ng-template" id="field-upload.html">
-    <upload-box label="(( field.label ))" ng-model="dataSet[field.name]"></upload-box>
+    <upload-box options="(( field.options ))" ng-model="dataSet[field.name]"></upload-box>
 </script>
 
 <script type="text/ng-template" id="field-post.html">
-    <post-box label="(( field.label ))" ng-model="dataSet[field.name]"></post-box>
+    <post-box options="(( field.options ))" ng-model="dataSet[field.name]"></post-box>
 </script>
 
 <!-- Upload button -->
@@ -56,18 +56,18 @@
     <div ng-click="openModal()" class="upload-box">
         <input ng-if="!binded" type="hidden" name="(( name ))" value="(( image | json ))">
         <img ng-show="image" ng-src="(( image.url ))">
-        <input ng-hide="image" class="button" type="button" value="(( label ))">
+        <button ng-hide="image" class="button" type="button">(( options.label ))</button>
     </div>
 </script>
 
 <!-- Post selector -->
 
 <script type="text/ng-template" id="post-box.html">
-    <div class="post-box">
+    <div ng-class="{'without-label': options.hideLabel}" class="post-box">
         <input ng-if="!binded" type="hidden" name="(( name ))" value="(( post.id ))">
 
         <label>
-            <strong>(( label ))</strong> <br>
+            <strong>(( options.label )) <br></strong>
 
             <button ng-click="modal.open()" ng-disabled="loading" class="button-icon" type="button">
                 <span class="dashicons dashicons-edit"></span>

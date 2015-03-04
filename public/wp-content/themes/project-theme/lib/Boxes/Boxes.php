@@ -18,40 +18,45 @@ class Boxes implements LoaderInterface
         });
     }
 
-    static public function sequential($name, $data, $fields)
+    static public function sequential($name, $data, $fields, $options = array())
     {
         self::init();
+
+        $options = array_merge(array(
+            'layout' => 'classic'
+        ), $options);
 
         Timber::render('boxes/sequential.twig', array(
             'name' => $name,
             'data' => $data,
             'fields' => $fields,
+            'options' => $options
         ));
 
         self::destroy();
     }
 
-    static public function upload($label, $name, $data)
+    static public function upload($name, $data, $options = array())
     {
         self::init();
 
         Timber::render('boxes/upload.twig', array(
-            'label' => $label,
             'name' => $name,
-            'data' => $data
+            'data' => $data,
+            'options' => $options
         ));
 
         self::destroy();
     }
 
-    static public function post($label, $name, $data)
+    static public function post($name, $data, $options = array())
     {
         self::init();
 
         Timber::render('boxes/post.twig', array(
-            'label' => $label,
             'name' => $name,
-            'data' => $data
+            'data' => $data,
+            'options' => $options
         ));
 
         self::destroy();

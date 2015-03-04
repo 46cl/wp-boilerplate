@@ -53,6 +53,7 @@ jQuery(function() {
             scope: {
                 name: '@',
                 fields: '=',
+                options: '=',
                 dataTxt: '@data'
             },
             templateUrl: 'sequential-boxes.html',
@@ -83,7 +84,7 @@ jQuery(function() {
 
         function link(scope, element, attrs, NgModelCtrl) {
 
-            // Non-scope accessible
+            // Create a wrapper to manage the media modal
             var select = function(image) {
                 scope.image = {};
 
@@ -100,10 +101,19 @@ jQuery(function() {
                 scope.$apply();
             };
 
-            // Scope accessible
             scope.frame = null;
             scope.binded = angular.isDefined(attrs.ngModel);
 
+            // Manage options
+            scope.options = {
+                'label': 'Ajouter une image'
+            };
+
+            try {
+                scope.options = $.extend(scope.options, JSON.parse(attrs.options));
+            } catch(e) {}
+
+            // Retrieve the current data
             if (scope.binded) {
                 scope.$watch(NgModelCtrl, function() {
                     scope.image = NgModelCtrl.$modelValue;
@@ -129,7 +139,6 @@ jQuery(function() {
             replace: true,
             require: '?ngModel',
             scope: {
-                label: '@',
                 name: '@'
             },
             templateUrl: 'upload-box.html',
@@ -142,7 +151,7 @@ jQuery(function() {
      * Post box
      */
 
-    .directive('postBox', ['$rootScope', '$http', function($rootScope, $http) {
+    .directive('postBox', ['$rootScope', '$http', '$timeout', function($rootScope, $http, $timeout) {
 
         var lastInputId = 0;
 
@@ -160,6 +169,16 @@ jQuery(function() {
 
             scope.binded = angular.isDefined(attrs.ngModel);;
             scope.inputId = 'post-box-' + lastInputId++;
+
+            // Manage options
+            scope.options = {
+                'hideLabel': false,
+                'label': 'Sélectionner un contenu'
+            };
+
+            try {
+                scope.options = $.extend(scope.options, JSON.parse(attrs.options));
+            } catch(e) {}
 
             // Create a wrapper to manage the wpLink modal
             scope.modal = {
@@ -183,7 +202,7 @@ jQuery(function() {
                     this.$modal.addClass('search-panel-visible post-box-modal');
                     wpLink.open(scope.inputId);
 
-                    this.$title.textContent = scope.label;
+                    this.$title.textContent = scope.options.label;
                     this.$submit.val('Valider');
                     this.$search.focus();
                 },
@@ -267,7 +286,6 @@ jQuery(function() {
             replace: true,
             require: '?ngModel',
             scope: {
-                label: '@',
                 name: '@'
             },
             templateUrl: 'post-box.html',
