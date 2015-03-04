@@ -77,7 +77,7 @@
                  class="post-box-title"
                  title="(( post.title ))">
                 <span class="spinner"></span>
-                <span ng-if="post.title">(( post.title ))</span>
+                <span ng-if="post.title" ng-bind-html="post.title"></span>
                 <em ng-if="!post.title">Aucun contenu lié</em>
             </div>
         </label>

@@ -177,8 +177,8 @@ jQuery(function() {
      */
 
     .directive('postBox', [
-        '$rootScope', '$http', '$timeout', '$sequentialBoxes',
-        function($rootScope, $http, $timeout, $sequentialBoxes) {
+        '$rootScope', '$http', '$timeout', '$sce', '$sequentialBoxes',
+        function($rootScope, $http, $timeout, $sce, $sequentialBoxes) {
 
             var lastInputId = 0;
 
@@ -244,12 +244,13 @@ jQuery(function() {
 
                         var formPost = wpLink.getAttrs();
 
-                        // Retrieve the ID of the post using the native Wordpress search endpoint
+                        // Retrieve the ID of the post
                         $http.post('/wp-admin/admin-ajax.php', {
                             action: 'post_box',
                             permalink: formPost.href
                         }).success(function(post) {
                             scope.post = post;
+                            scope.post.title = $sce.trustAsHtml(scope.post.title);
 
                             if (scope.binded) {
                                 NgModelCtrl.$setViewValue(post.id);
@@ -288,6 +289,7 @@ jQuery(function() {
                         id: id
                     }).success(function(post) {
                         scope.post = post;
+                        scope.post.title = $sce.trustAsHtml(scope.post.title);
                         scope.loading = false;
                     });
                 }
