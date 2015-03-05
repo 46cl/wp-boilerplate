@@ -335,7 +335,7 @@ jQuery(function() {
      * Bootstrapping
      */
 
-    if ($(document.body).hasClass('post-php')) {
+    if (!$(document.body).hasClass('nav-menus-php')) {
         angular.bootstrap(document, ['wp-admin']);
     }
 
