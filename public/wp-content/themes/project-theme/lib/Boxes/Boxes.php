@@ -104,11 +104,21 @@ class Boxes implements LoaderInterface
     {
         $base = get_stylesheet_directory_uri() . '/lib/' . basename(__DIR__);
 
-        wp_enqueue_style('boxes-admin', $base . '/stylesheets/boxes.css');
+        // JS dependencies provided by Wordpress
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-widget');
+        wp_enqueue_script('jquery-ui-mouse');
+        wp_enqueue_script('jquery-ui-sortable');
 
+        // External JS dependencies
         wp_enqueue_script('boxes-angular', '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js');
         wp_enqueue_script('boxes-ui-sortable', '//cdnjs.cloudflare.com/ajax/libs/angular-ui-sortable/0.13.3/sortable.min.js');
+
+        // Our own scripts
         wp_enqueue_script('boxes-admin', $base . '/scripts/boxes.js');
+
+        // Our own stylesheets
+        wp_enqueue_style('boxes-admin', $base . '/stylesheets/boxes.css');
     }
 
     static private function init()
