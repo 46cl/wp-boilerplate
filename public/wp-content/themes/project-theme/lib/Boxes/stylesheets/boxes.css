@@ -150,11 +150,22 @@
     top: -3px;
 }
 
+.sequential-boxes.large-layout.with-upload-first .sequential-box {
+    padding-left: 240px;
+}
+
+.sequential-boxes.large-layout.with-upload-first .sequential-box [ng-repeat]:first-of-type .upload-box {
+    float: left;
+    margin-left: -220px;
+    width: 200px;
+}
+
 /*
  * Upload boxes
  */
 
 .upload-box {
+    box-sizing: border-box;
     margin: 20px auto;
     border: 1px dashed #ccc;
     max-width: 400px;
@@ -203,6 +214,7 @@
 }
 
 .post-box {
+    box-sizing: border-box;
     margin: 10px 0;
 }
 

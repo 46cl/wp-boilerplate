@@ -1,7 +1,8 @@
 <!-- Sequential boxes: core -->
 
 <script type="text/ng-template" id="sequential-boxes.html">
-    <div class="sequential-boxes (( options.layout ))-layout">
+    <div ng-class="{'with-upload-first': fields[0].type == 'upload'}"
+         class="sequential-boxes (( options.layout ))-layout">
         <div ui-sortable ng-model="data">
             <div ng-repeat="dataSet in data" class="sequential-box">
                 <button ng-click="remove(dataSet)" class="button-icon button-delete" type="button">
