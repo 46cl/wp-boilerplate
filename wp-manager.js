@@ -291,12 +291,14 @@ commands.serve = function() {
 
 commands.composer = function() {
 
-    var themeName = manager.envDoesntMatch(['prod', 'dev']) ? 'project-theme' : project.slug;
+    var themeName = project.wordpress.version == null ? 'project-theme' : project.slug;
 
-    try {
-        manager.wp('core is-installed');
-    } catch(e) {
-        themeName = 'project-theme';
+    if (manager.envDoesntMatch(['prod', 'dev'])) {
+        try {
+            manager.wp('core is-installed');
+        } catch(e) {
+            themeName = 'project-theme';
+        }
     }
 
     shell.cd(WP_ROOT + '/wp-content/themes/' + themeName);
