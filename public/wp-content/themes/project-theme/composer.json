@@ -1,0 +1,11 @@
+{
+    "name": "46cl/wp-boilerplate",
+    "description": "A Wordpress boilerplate created by 46cl",
+    "authors": [
+        {
+            "name": "46cl",
+            "email": "hello@46cl.fr"
+        }
+    ],
+    "require": {}
+}

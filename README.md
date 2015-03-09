@@ -2,7 +2,9 @@
 
 Tested on Wordpress 4.1
 
-## Requirements
+## Dependencies
+
+Required dependencies:
 
 * [Git](http://git-scm.com/)
 * [PHP](http://php.net/) v5.3+
@@ -11,13 +13,17 @@ Tested on Wordpress 4.1
 * [WP-CLI](http://wp-cli.org/)
 * [wp server](https://github.com/wp-cli/server-command)
 
+Optional __but recommended__ dependencies:
+
+* [Composer](https://getcomposer.org/)
+
 ### Quick setup for OS X users
 
 Install [Homebrew](http://brew.sh/) and run `brew doctor`. If everything seems OK, install the required packages with those commands:
 
 ```shell
 brew tap homebrew/php
-brew install git php mysql node wp-cli
+brew install git php mysql node wp-cli composer
 ```
 
 Make sure MySQL's server is started with `mysql.server start`.
@@ -64,6 +70,25 @@ To watch for your assets modifications, use `npm run watch`.
 ## Theming
 
 The boilerplate is provided with a theme ready to use. It leverages some redundant tasks and provides a structure for your files.
+
+### PHP dependencies
+
+Composer is installed with the theme, allowing you to easily add PHP dependencies. To run Composer through the command-line:
+
+```shell
+$ pwd
+/home/johann/wp-boilerplate
+$ cd public/wp-content/themes/your_theme_name
+$ composer require vendor/name
+```
+
+However, if you want to use Composer straight from the root of your project, we created a command for you:
+
+```shell
+$ pwd
+/home/johann/wp-boilerplate
+$ npm run composer -- require vendor/name
+```
 
 ### Configuration
 

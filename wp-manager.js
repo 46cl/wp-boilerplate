@@ -289,6 +289,28 @@ commands.serve = function() {
 
 };
 
+commands.composer = function() {
+
+    var themeName = manager.envDoesntMatch(['prod', 'dev']) ? 'project-theme' : project.slug;
+
+    try {
+        manager.wp('core is-installed');
+    } catch(e) {
+        themeName = 'project-theme';
+    }
+
+    shell.cd(WP_ROOT + '/wp-content/themes/' + themeName);
+
+    // Use the spawn method to preserve colors in the console
+    spawn('composer', process.argv.slice(3), {stdio: 'inherit'}).on('error', function(error) {
+        // Throw errors only if Composer is installed
+        if (error.code != 'ENOENT') {
+            throw error;
+        }
+    });
+
+};
+
 /*
  * Run the requested command
  */

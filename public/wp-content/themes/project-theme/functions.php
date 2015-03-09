@@ -1,8 +1,8 @@
 <?php
 
-// Load the settings
-foreach (glob(__DIR__ .'/config{/,/*/}*.php', GLOB_BRACE) as $filename) {
-    require_once $filename;
+// Load the vendors
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    include_once __DIR__ . '/vendor/autoload.php';
 }
 
 // Load the libraries
@@ -20,4 +20,9 @@ foreach (glob(__DIR__ . '/lib/*/') as $libraryPath) {
             call_user_func($library . '::load');
         }
     }
+}
+
+// Load the configuration
+foreach (glob(__DIR__ .'/config{/,/*/}*.php', GLOB_BRACE) as $filename) {
+    require_once $filename;
 }
