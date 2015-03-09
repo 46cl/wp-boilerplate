@@ -61,9 +61,186 @@ To run a local server, use `npm run wp-serve`.
 
 To watch for your assets modifications, use `npm run watch`.
 
-## Theme configuration
+## Theming
+
+The boilerplate is provided with a theme ready to use. It leverages some redundant tasks and provides a structure for your files.
+
+### Configuration
 
 In the configuration file of the theme (`config/theme.php`), you can define versions for your assets. Those will be used by the `asset` Twig filter, see the `views/layout.twig` file for an usage example of this filter.
+
+### Boxes
+
+The theme contains a feature we named “Boxes”. It allows you to easily add some new form components in your metaboxes, each component is a “box”.
+
+Each box takes a name which will be used to submit the data through the classic form submission. This data is structured with JSON, to save it as meta data you should previously pass it to the `Utils::jsonValue()` method:
+
+```php
+$value = Utils::jsonValue($_POST['my_box_data']);
+update_post_meta($post->ID, 'my_box_data', $value);
+```
+
+This will convert the data from JSON data to a PHP object which can be automatically serialized and unserialized by the `*_post_meta()` functions provided by Wordpress.
+
+#### Upload box
+
+Outputs an upload button which uses the media modal:
+
+```php
+/**
+ * @param  {string} $name    The name of the input
+ * @param  {array}  $data    The data
+ * @param  {array}  $options An array of options
+ */
+function upload($name, $data, $options = array())
+```
+
+Usage example:
+
+```php
+Boxes::upload(
+    'my_upload_file',
+    get_post_meta($post->ID, 'my_upload_file', true),
+    array(
+
+        /**
+         * Defines the text used for the button.
+         * Defaults to: "Ajouter une image"
+         */
+        'label' => 'Add a new file',
+
+        /**
+         * Defines if the modal should be automatically opened on box
+         * addition. This is effective only when used in sequential boxes.
+         * Defaults to: false
+         */
+        'openModalOnAddition' => true,
+
+    )
+);
+```
+
+#### Post box
+
+Outputs a field allowing to select a post with the modal used by the editor when adding a new link in the content:
+
+```php
+/**
+ * @param  {string} $name    The name of the input
+ * @param  {array}  $data    The data
+ * @param  {array}  $options An array of options
+ */
+function post($name, $data, $options = array())
+```
+
+Usage example:
+
+```php
+Boxes::post(
+    'my_linked_post',
+    get_post_meta($post->ID, 'my_linked_post', true),
+    array(
+
+        /**
+         * Defines the text used for the label and the modal title.
+         * Defaults to: "Ajouter une image"
+         */
+        'label' => 'Add a new file',
+
+        /**
+         * Defines if the modal should be automatically opened on box
+         * addition. This is effective only when used in sequential boxes.
+         * Defaults to: false
+         */
+        'openModalOnAddition' => true,
+
+        /**
+         * Should we hide the label?
+         * Defaults to: false
+         */
+        'hideLabel' => true,
+
+    )
+);
+```
+
+#### Sequential boxes
+
+Outputs a UI allowing the user to add multiple times a predefined set of fields:
+
+```php
+/**
+ * @param  {string} $name    The name of the input
+ * @param  {array}  $data    The data
+ * @param  {array}  $fields  An array of fields
+ * @param  {array}  $options An array of options
+ */
+function sequential($name, $data, $fields, $options = array())
+```
+
+Usage example:
+
+```php
+Boxes::sequential(
+    'my_sequential_boxes',
+    get_post_meta($post->ID, 'my_sequential_boxes', true),
+    array(
+
+        /**
+         * An input[type=text]
+         */
+        array(
+            'type' => 'text',
+            'name' => 'my_input_text',
+            'label' => 'My input text'
+        ),
+
+        /**
+         * A textarea
+         */
+        array(
+            'type' => 'textarea',
+            'name' => 'my_textarea',
+            'label' => 'My textarea'
+        ),
+
+        /**
+         * An upload box
+         */
+        array(
+            'type' => 'upload',
+            'name' => 'my_upload_box',
+            'options' => array(
+                'label' => 'My upload box',
+                'openModalOnAddition' => true
+            )
+        ),
+
+        /**
+         * A post box
+         */
+        array(
+            'type' => 'post',
+            'name' => 'my_post_box',
+            'options' => array(
+                'label' => 'My post box',
+                'openModalOnAddition' => true,
+                'hideLabel' => true
+            )
+        ),
+
+    ),
+    array(
+
+        /**
+         * The layout to use between "classic" and "large".
+         * Defaults to: "classic"
+         */
+        'layout' => 'large',
+
+    )
+);
+```
 
 ## Contribute
 
