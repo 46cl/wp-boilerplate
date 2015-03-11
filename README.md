@@ -23,7 +23,7 @@ Install [Homebrew](http://brew.sh/) and run `brew doctor`. If everything seems O
 
 ```shell
 brew tap homebrew/php
-brew install git php mysql node wp-cli composer
+brew install git php56 mysql node wp-cli composer
 ```
 
 Make sure MySQL's server is started with `mysql.server start`.
@@ -33,7 +33,7 @@ Install __wp server__ with the following commands (based [on this guide](https:/
 ```shell
 mkdir -p ~/.wp-cli/commands
 git clone https://github.com/wp-cli/server-command.git ~/.wp-cli/commands/server
-echo "require:\n  - commands/server/command.php" > ~/.wp-cli/config.yml
+echo -e "require:\n  - commands/server/command.php" > ~/.wp-cli/config.yml
 ```
 
 That's it!
