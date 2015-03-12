@@ -20,8 +20,12 @@
 
             "app": {
                 "icons": {},
+
                 "stylesheets": "%theme_path%/app/stylesheets/*.less",
-                "scripts": "%theme_path%/app/scripts/*"
+
+                "scripts": {
+                    "app": "%theme_path%/app/scripts/app/**"
+                }
             }
         },
 

@@ -62,6 +62,18 @@ function error(error) {
     this.emit('end');
 }
 
+function loopTransformers(array, callback) {
+    var streams = [];
+
+    array.forEach(function() {
+        streams.push(callback.apply(null, Array.prototype.slice.call(arguments)));
+    });
+
+    if (streams.length) {
+        return combiner.obj(streams);
+    }
+}
+
 /*
  * Transformers
  */
@@ -107,11 +119,11 @@ function stylesheetsTransformer(src, isVendor) {
 
 }
 
-function scriptsTransformer(src, isVendor) {
+function scriptsTransformer(name, src) {
 
     return gulp.src(path(src))
         .pipe(sourcemaps.init())
-        .pipe(concat(!isVendor ? 'app.js' : 'vendor.js'))
+        .pipe(concat(name + '.js'))
         .pipe(uglify().on('error', error))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(path(paths.dest.scripts)));
@@ -125,16 +137,11 @@ function scriptsTransformer(src, isVendor) {
 gulp.task('default', ['icons', 'vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
 
 gulp.task('icons', function() {
-    var icons = paths.src.app.icons,
-        streams = [];
+    var icons = paths.src.app.icons;
 
-    Object.keys(icons).forEach(function(name) {
-        streams.push(iconsTransformer(name, icons[name]));
+    return loopTransformers(Object.keys(icons), function(name) {
+        return iconsTransformer(name, icons[name]);
     });
-
-    if (streams.length) {
-        return combiner.obj(streams);
-    }
 });
 
 gulp.task('vendor/stylesheets', ['icons'], function() {
@@ -142,7 +149,7 @@ gulp.task('vendor/stylesheets', ['icons'], function() {
 });
 
 gulp.task('vendor/scripts', function() {
-    return scriptsTransformer(paths.src.vendor.scripts, true);
+    return scriptsTransformer('vendor', paths.src.vendor.scripts);
 });
 
 gulp.task('app/stylesheets', ['icons'], function() {
@@ -150,7 +157,11 @@ gulp.task('app/stylesheets', ['icons'], function() {
 });
 
 gulp.task('app/scripts', function() {
-    return scriptsTransformer(paths.src.app.scripts);
+    var scripts = paths.src.app.scripts;
+
+    return loopTransformers(Object.keys(scripts), function(name) {
+        return scriptsTransformer(name, scripts[name]);
+    });
 });
 
 /*
