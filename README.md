@@ -71,6 +71,92 @@ To watch for your assets modifications, use `npm run watch`.
 
 The boilerplate is provided with a theme ready to use. It leverages some redundant tasks and provides a structure for your files.
 
+### Assets management
+
+The boilerplate is provided with __Bower__ and a __Gulp__ configuration ready to be used to concatenate script files and compile __Less__, with sourcemaps. Icon fonts generation also comes out of the box.
+
+All the assets that should be compiled live in the `app/` directory of your theme. The output after compilation will be saved to the `assets/` directory.
+
+You don't need to touch the `gulpfile.js` file to add new paths to the compilation tasks, everything lives in the `wp-project.json` file:
+
+```js
+{
+    // ...
+
+    "assets-paths": {
+        "src": {
+            "vendor": {
+                "stylesheets": "bower_components/normalize.css/normalize.css",
+                "scripts": ""
+            },
+
+            "app": {
+                "icons": {},
+                "stylesheets": "%theme_path%/app/stylesheets/*.less",
+                "scripts": "%theme_path%/app/scripts/*"
+            }
+        },
+
+        "dest": {
+            "fonts": "%theme_path%/assets/fonts/",
+            "stylesheets": "%theme_path%/assets/",
+            "scripts": "%theme_path%/assets/"
+        },
+
+        "watch": "%theme_path%/app/**"
+    }
+}
+```
+
+The __%theme_path%__ keyword is automatically replaced at compilation time by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
+
+Every path in the configuration file will be interpreted by the `gulp.src()` method (once the __%theme_path%__ keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
+
+#### Icon fonts generation
+
+While the properties of the assets configuration should be clear, you could need some help for the `icons` section. If you have a bunch of SVG files you want to embed in a font you will need [to prepare them](https://github.com/nfroidure/gulp-iconfont#preparing-svgs).
+
+Once this is done, choose a name for your font, "ico" for example, and add a new object to the `icons` section:
+
+```js
+// ...
+
+"icons": {
+    "ico": {
+        "stylesheet-tpl": "%theme_path%/app/stylesheets/icons.css.swig",
+        "svgs": "%theme_path%/app/icons/ico/*.svg",
+        "fonts-path-from-css": "./fonts/"
+    }
+},
+
+// ...
+```
+
+Here's some explanations:
+
+* The `"ico"` key is the name of your font.
+* `"stylesheet-tpl"` contains a path to a template used to generate the final stylesheet associated to your fonts. The templating language is [Swig](http://paularmstrong.github.io/swig/), we already provide you a ready-to-use template (located at the specified path above), feel free to edit it.
+* `"svgs"` is where your SVG files are located.
+* Finally, you need to provide a relative path to allow the generated stylesheet to find the fonts.
+
+Run `npm run watch` in your console and add your new stylesheet to your HTML:
+
+```twig
+<link rel="stylesheet" href="{{ 'ico.css'|asset('app') }}">
+```
+
+Now you can use the classes in your HTML:
+
+```html
+<span class="ico ico-my-icon"></span>
+```
+
+If you want to use the classes created for your icon font in other stylesheets, you can import the icon stylesheet in your `app.less` file instead of importing it in the HTML code:
+
+```less
+@import (inline) '../../assets/ico.css';
+```
+
 ### PHP dependencies
 
 Composer is installed with the theme, allowing you to easily add PHP dependencies. To run Composer through the command-line:

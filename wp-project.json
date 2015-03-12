@@ -19,16 +19,14 @@
             },
 
             "app": {
-                "stylesheets": [
-                    "%theme_path%/app/stylesheets/app.less",
-                    "%theme_path%/app/stylesheets/admin.less",
-                    "%theme_path%/app/stylesheets/editor.less"
-                ],
+                "icons": {},
+                "stylesheets": "%theme_path%/app/stylesheets/*.less",
                 "scripts": "%theme_path%/app/scripts/*"
             }
         },
 
         "dest": {
+            "fonts": "%theme_path%/assets/fonts/",
             "stylesheets": "%theme_path%/assets/",
             "scripts": "%theme_path%/assets/"
         },
