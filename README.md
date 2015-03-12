@@ -1,6 +1,8 @@
 # WP-Boilerplate
 
-Tested on Wordpress 4.1
+A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), _icon fonts generation_, _scripts concatenation_, and _project management_ allowing to automatically install and run your new project on your working computer.
+
+Tested on Wordpress 4.1.
 
 ## Dependencies
 
