@@ -35,6 +35,8 @@
             "scripts": "%theme_path%/assets/"
         },
 
+        "tmp": "%theme_path%/.tmp/",
+
         "watch": "%theme_path%/app/**"
     }
 }

@@ -24,5 +24,6 @@ public/wp-content/themes/index.php
 
 # Theme
 
+public/wp-content/themes/*/.tmp/
 public/wp-content/themes/*/assets/
 public/wp-content/themes/*/vendor/

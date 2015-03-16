@@ -95,11 +95,16 @@ function iconsTransformer(name, iconsPaths) {
                         glyphs: codepoints
                     }
                 }))
-                .pipe(minifyCss(gulpOpts.minifyCss).on('error', error))
                 .pipe(rename({
                     basename: name,
-                    extname: '.css'
+                    extname: '.less'
                 }))
+                .pipe(gulp.dest(path(paths.tmp)))
+                .pipe(sourcemaps.init())
+                .pipe(less().on('error', error))
+                .pipe(minifyCss(gulpOpts.minifyCss).on('error', error))
+                .pipe(rename({extname: '.css'}))
+                .pipe(sourcemaps.write('./'))
                 .pipe(gulp.dest(path(paths.dest.stylesheets)));
         })
         .pipe(gulp.dest(path(paths.dest.fonts)));

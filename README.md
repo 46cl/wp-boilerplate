@@ -94,8 +94,12 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
 
             "app": {
                 "icons": {},
+
                 "stylesheets": "%theme_path%/app/stylesheets/*.less",
-                "scripts": "%theme_path%/app/scripts/*"
+
+                "scripts": {
+                    "app": "%theme_path%/app/scripts/app/**"
+                }
             }
         },
 
@@ -104,6 +108,8 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
             "stylesheets": "%theme_path%/assets/",
             "scripts": "%theme_path%/assets/"
         },
+
+        "tmp": "%theme_path%/.tmp/",
 
         "watch": "%theme_path%/app/**"
     }
@@ -125,7 +131,7 @@ Once this is done, choose a name for your font, "ico" for example, and add a new
 
 "icons": {
     "ico": {
-        "stylesheet-tpl": "%theme_path%/app/stylesheets/icons.css.swig",
+        "stylesheet-tpl": "%theme_path%/app/stylesheets/icons.less.swig",
         "svgs": "%theme_path%/app/icons/ico/*.svg",
         "fonts-path-from-css": "./fonts/"
     }
@@ -153,10 +159,15 @@ Now you can use the classes in your HTML:
 <span class="ico ico-my-icon"></span>
 ```
 
-If you want to use the classes created for your icon font in other stylesheets, you can import the icon stylesheet in your `app.less` file instead of importing it in the HTML code:
+If you want to use the classes created for your icon font in other stylesheets, you can import the intermediate Less stylesheet in your `app.less` file instead of importing the CSS file in the HTML code:
 
 ```less
-@import (inline) '../../assets/ico.css';
+@import '../../.tmp/ico.less';
+
+// Now you can, for example, extend the generated classes:
+.title {
+    &:extend(.ico all, .ico-my-icon all);
+}
 ```
 
 ### PHP dependencies
