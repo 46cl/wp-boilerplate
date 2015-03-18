@@ -256,11 +256,17 @@ commands.install = function() {
     }, ['prod', 'dev', notInitializedEnv]);
 
     manager.task('Reinitializing the Git project', function() {
+        var lastCommit = manager.exec('git log -n 1 --format=oneline').trim();
+
         rimraf.sync('.git');
 
         manager.exec('git init');
         manager.exec('git add -A');
-        manager.exec('git commit -m "New Wordpress install (v' + project.wordpress.version + ')"');
+        manager.exec([
+            'git commit',
+            '-m "New Wordpress install (v' + project.wordpress.version + ')"',
+            '-m "Initialized with commit: ' + lastCommit + '"'
+        ].join(' '));
     }, ['prod', 'dev', notInitializedEnv]);
 
     /*
