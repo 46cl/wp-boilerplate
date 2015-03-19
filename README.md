@@ -104,6 +104,7 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
         },
 
         "dest": {
+            "clean": "%theme_path%/assets/",
             "fonts": "%theme_path%/assets/fonts/",
             "stylesheets": "%theme_path%/assets/",
             "scripts": "%theme_path%/assets/"

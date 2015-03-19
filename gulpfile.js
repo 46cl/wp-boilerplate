@@ -9,6 +9,7 @@ var project = require('./wp-project.json'),
 
 var chalk = require('chalk'),
     combiner = require('stream-combiner2'),
+    del = require('del'),
     gulp = require('gulp');
 
 var concat = require('gulp-concat'),
@@ -139,9 +140,13 @@ function scriptsTransformer(name, src) {
  * Tasks
  */
 
-gulp.task('default', ['icons', 'vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
+gulp.task('default', ['clean', 'icons', 'vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
 
-gulp.task('icons', function() {
+gulp.task('clean', function(cb) {
+    del(path(paths.dest.clean), cb);
+});
+
+gulp.task('icons', ['clean'], function() {
     var icons = paths.src.app.icons;
 
     return loopTransformers(Object.keys(icons), function(name) {
@@ -149,19 +154,19 @@ gulp.task('icons', function() {
     });
 });
 
-gulp.task('vendor/stylesheets', ['icons'], function() {
+gulp.task('vendor/stylesheets', ['clean', 'icons'], function() {
     return stylesheetsTransformer(paths.src.vendor.stylesheets, true);
 });
 
-gulp.task('vendor/scripts', function() {
+gulp.task('vendor/scripts', ['clean'], function() {
     return scriptsTransformer('vendor', paths.src.vendor.scripts);
 });
 
-gulp.task('app/stylesheets', ['icons'], function() {
+gulp.task('app/stylesheets', ['clean', 'icons'], function() {
     return stylesheetsTransformer(paths.src.app.stylesheets);
 });
 
-gulp.task('app/scripts', function() {
+gulp.task('app/scripts', ['clean'], function() {
     var scripts = paths.src.app.scripts;
 
     return loopTransformers(Object.keys(scripts), function(name) {
