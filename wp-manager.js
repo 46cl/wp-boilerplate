@@ -255,7 +255,7 @@ commands.install = function() {
     }, ['prod', 'dev', notInitializedEnv]);
 
     manager.task('Reinitializing the Git project', function() {
-        var lastCommit = manager.exec('git log -n 1 --format=oneline').trim();
+        var lastCommit = manager.exec('git log -n 1 --format=oneline').trim().replace(/(`|")/g, '\\$1');
 
         rimraf.sync('.git');
 
@@ -308,7 +308,7 @@ commands.composer = function() {
         }
     }
 
-    shell.cd(WP_ROOT + '/wp-content/themes/' + themeName);
+    shell.cd(THEMES_PATH + '/' + themeName);
 
     // Use the spawn method to preserve colors in the console
     spawn('composer', process.argv.slice(3), {stdio: 'inherit'}).on('error', function(error) {
