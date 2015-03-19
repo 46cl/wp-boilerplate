@@ -20,6 +20,7 @@ var argv = require('yargs').argv,
 var WP_BOILERPLATE_ENV = (process.env.WP_BOILERPLATE_ENV || '').toLowerCase();
 
 var WP_ROOT = 'public',
+    THEMES_PATH = WP_ROOT + '/wp-content/themes',
     ENV = !argv.skipEnvCheck && ['prod', 'dev', 'contrib'].indexOf(WP_BOILERPLATE_ENV) != -1
         ? process.env.WP_BOILERPLATE_ENV.toLowerCase()
         : 'dev';
@@ -214,15 +215,13 @@ commands.install = function() {
     });
 
     manager.task('Renaming the project theme', function() {
-        var themesPath = 'public/wp-content/themes/';
-
-        manager.writeFile(themesPath + 'project-theme/style.css', [
+        manager.writeFile(THEMES_PATH + '/project-theme/style.css', [
             '/*',
             'Theme Name: ' + project.title,
             '*/\n'
         ].join('\n'));
 
-        if (fs.renameSync(themesPath + 'project-theme', themesPath + project.slug)) {
+        if (fs.renameSync(THEMES_PATH + '/project-theme', THEMES_PATH + '/' + project.slug)) {
             throw new Error("The theme directory cannot be renamed...");
         }
     }, ['prod', 'dev', notInitializedEnv]);
@@ -297,13 +296,15 @@ commands.serve = function() {
 
 commands.composer = function() {
 
-    var themeName = project.wordpress.version == null ? 'project-theme' : project.slug;
+    var themeName = 'project-theme';
 
-    if (manager.envDoesntMatch(['prod', 'dev'])) {
+    if (project.wordpress.version) {
+        themeName = project.slug;
+    } else if (manager.envDoesntMatch(['prod', 'dev'])) {
         try {
-            manager.wp('core is-installed');
-        } catch(e) {
-            themeName = 'project-theme';
+            fs.statSync(THEMES_PATH + '/project-theme');
+        } catch(error) {
+            if (error.code == 'ENOENT') themeName = project.slug;
         }
     }
 
