@@ -15,7 +15,10 @@
             </div>
         </div>
 
-        <div ng-click="add()" ng-class="{clear: data.length % 3 == 0}" class="sequential-box sequential-box-add">
+        <div ng-click="add()"
+             ng-class="{clear: data.length % 3 == 0}"
+             ng-hide="data.length >= options.max"
+             class="sequential-box sequential-box-add">
             <div ng-repeat="field in fields">
                 <ng-include src="(( 'field-' + field.type + '.html' ))"></ng-include>
             </div>

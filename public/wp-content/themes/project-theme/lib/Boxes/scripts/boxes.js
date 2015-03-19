@@ -54,6 +54,10 @@ jQuery(function() {
             } catch(e) {}
 
             scope.add = function() {
+                if (angular.isDefined(scope.options.max) && scope.data >= scope.options.max) {
+                    return;
+                }
+
                 $sequentialBoxes.itemJustAdded = true;
                 scope.data.push({});
             };

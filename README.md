@@ -363,6 +363,12 @@ Boxes::sequential(
          */
         'layout' => 'large',
 
+        /**
+         * A maximum of sequential boxes the user can add.
+         * Defaults to: null
+         */
+        'max' => 'large',
+
     )
 );
 ```
