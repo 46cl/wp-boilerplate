@@ -67,6 +67,8 @@ If the installation failed for any reason, just run `npm run wp-clean` to rollba
 
 To run a local server, use `npm run wp-serve`. Available options are `--host` and `--port`, for example: `npm run wp-serve -- --host=0.0.0.0 --port=8000`
 
+You can now log in the back office with the __admin__ user and __admin__ password.
+
 To watch for your assets modifications, use `npm run watch`.
 
 ## Theming
