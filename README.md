@@ -135,8 +135,7 @@ Once this is done, choose a name for your font, "ico" for example, and add a new
 "icons": {
     "ico": {
         "stylesheet-tpl": "%theme_path%/app/stylesheets/icons.less.swig",
-        "svgs": "%theme_path%/app/icons/ico/*.svg",
-        "fonts-path-from-css": "./fonts/"
+        "svgs": "%theme_path%/app/icons/ico/*.svg"
     }
 },
 
@@ -148,7 +147,6 @@ Here's some explanations:
 * The `"ico"` key is the name of your font.
 * `"stylesheet-tpl"` contains a path to a template used to generate the final stylesheet associated to your fonts. The templating language is [Swig](http://paularmstrong.github.io/swig/), we already provide you a ready-to-use template (located at the specified path above), feel free to edit it.
 * `"svgs"` is where your SVG files are located.
-* Finally, you need to provide a relative path to allow the generated stylesheet to find the fonts.
 
 Run `npm run watch` in your console and add your new stylesheet to your HTML:
 

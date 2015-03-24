@@ -7,6 +7,8 @@
 var project = require('./wp-project.json'),
     paths = project['assets-paths'];
 
+var path = require('path');
+
 var chalk = require('chalk'),
     combiner = require('stream-combiner2'),
     del = require('del'),
@@ -41,13 +43,15 @@ var gulpOpts = {
  */
 
 // Replaces "%theme_path%" by the real path
-function path(paths) {
+path.theme = function(paths) {
 
-    var replaceThemePath = function(path) {
-        return path.replace(
+    var replaceThemePath = function(themePath) {
+        themePath = themePath.replace(
             /%theme_path%/g,
             'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
         );
+
+        return path.normalize(themePath);
     };
 
     if (Array.isArray(paths)) {
@@ -81,18 +85,18 @@ function loopTransformers(array, callback) {
 
 function iconsTransformer(name, iconsPaths) {
 
-    return gulp.src(path(iconsPaths.svgs))
+    return gulp.src(path.theme(iconsPaths.svgs))
         .pipe(iconfont({
             fontName: name,
             appendCodepoints: true
         }))
         .on('codepoints', function(codepoints, options) {
-            gulp.src(path(iconsPaths['stylesheet-tpl']))
+            gulp.src(path.theme(iconsPaths['stylesheet-tpl']))
                 .pipe(swig({
                     defaults: {cache: false},
                     data: {
                         name: name,
-                        path: iconsPaths['fonts-path-from-css'].replace(/\/$/g, ''),
+                        path: path.relative(path.theme(paths.dest.stylesheets), path.theme(paths.dest.fonts)),
                         glyphs: codepoints
                     }
                 }))
@@ -100,39 +104,39 @@ function iconsTransformer(name, iconsPaths) {
                     basename: name,
                     extname: '.less'
                 }))
-                .pipe(gulp.dest(path(paths.tmp)))
+                .pipe(gulp.dest(path.theme(paths.tmp)))
                 .pipe(sourcemaps.init())
                 .pipe(less().on('error', error))
                 .pipe(minifyCss(gulpOpts.minifyCss).on('error', error))
                 .pipe(rename({extname: '.css'}))
                 .pipe(sourcemaps.write('./'))
-                .pipe(gulp.dest(path(paths.dest.stylesheets)));
+                .pipe(gulp.dest(path.theme(paths.dest.stylesheets)));
         })
-        .pipe(gulp.dest(path(paths.dest.fonts)));
+        .pipe(gulp.dest(path.theme(paths.dest.fonts)));
 
 }
 
 function stylesheetsTransformer(src, isVendor) {
 
-    return gulp.src(path(src))
+    return gulp.src(path.theme(src))
         .pipe(sourcemaps.init())
         .pipe(!isVendor ? gutil.noop() : concat('vendor.css'))
         .pipe(!isVendor ? less().on('error', error) : gutil.noop())
         .pipe(minifyCss(gulpOpts.minifyCss).on('error', error))
         .pipe(rename({extname: '.css'}))
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(path(paths.dest.stylesheets)));
+        .pipe(gulp.dest(path.theme(paths.dest.stylesheets)));
 
 }
 
 function scriptsTransformer(name, src) {
 
-    return gulp.src(path(src))
+    return gulp.src(path.theme(src))
         .pipe(sourcemaps.init())
         .pipe(concat(name + '.js'))
         .pipe(uglify().on('error', error))
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(path(paths.dest.scripts)));
+        .pipe(gulp.dest(path.theme(paths.dest.scripts)));
 
 }
 
@@ -143,7 +147,7 @@ function scriptsTransformer(name, src) {
 gulp.task('default', ['clean', 'icons', 'vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
 
 gulp.task('clean', function(cb) {
-    del(path(paths.dest.clean), cb);
+    del(path.theme(paths.dest.clean), cb);
 });
 
 gulp.task('icons', ['clean'], function() {
@@ -179,7 +183,7 @@ gulp.task('app/scripts', ['clean'], function() {
  */
 
 gulp.task('watch', function(cb) {
-    var watcher = gulp.watch(path(paths.watch), ['default']);
+    var watcher = gulp.watch(path.theme(paths.watch), ['default']);
 
     watcher.on('change', function(event) {
         var type = event.type.toUpperCase().slice(0, 1) + event.type.toLowerCase().slice(1);
