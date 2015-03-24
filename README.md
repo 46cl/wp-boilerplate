@@ -1,8 +1,8 @@
 # WP-Boilerplate
 
-A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), _icon fonts generation_, _scripts concatenation_, and _project management_ allowing to automatically install and run your new project on your working computer.
+A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), [Browserify](http://browserify.org/) (with [Babel](http://babeljs.io/) as an option), _icon fonts generation_, and _project management_ allowing to automatically install and run your new project on your working computer.
 
-Tested on Wordpress 4.1.
+Tested on Wordpress 4.1+
 
 ## Dependencies
 
@@ -100,7 +100,7 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
                 "stylesheets": "%theme_path%/app/stylesheets/*.less",
 
                 "scripts": {
-                    "app": "%theme_path%/app/scripts/app/**"
+                    "app": "%theme_path%/app/scripts/app.js"
                 }
             }
         },
@@ -122,6 +122,14 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
 The __%theme_path%__ keyword is automatically replaced at compilation time by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
 
 Every path in the configuration file will be interpreted by the `gulp.src()` method (once the __%theme_path%__ keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
+
+### ES6 with Babel
+
+Every scripts will be automatically passed to Babel to transpile ES6 to ES5. However, don't forget to require the polyfill if you use some methods introduced by this version of the specification, same goes if you use generators:
+
+```js
+require('babel/polyfill');
+```
 
 #### Icon fonts generation
 

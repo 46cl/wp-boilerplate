@@ -9,10 +9,14 @@ var project = require('./wp-project.json'),
 
 var path = require('path');
 
-var chalk = require('chalk'),
+var babelify = require('babelify'),
+    browserify = require('browserify'),
+    buffer = require('vinyl-buffer'),
+    chalk = require('chalk'),
     combiner = require('stream-combiner2'),
     del = require('del'),
-    gulp = require('gulp');
+    gulp = require('gulp'),
+    source = require('vinyl-source-stream');
 
 var concat = require('gulp-concat'),
     gutil = require('gulp-util'),
@@ -45,13 +49,13 @@ var gulpOpts = {
 // Replaces "%theme_path%" by the real path
 path.theme = function(paths) {
 
-    var replaceThemePath = function(themePath) {
-        themePath = themePath.replace(
+    var replaceThemePath = function(singlePath) {
+        singlePath = singlePath.replace(
             /%theme_path%/g,
             'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
         );
 
-        return path.normalize(themePath);
+        return path.normalize(singlePath);
     };
 
     if (Array.isArray(paths)) {
@@ -60,7 +64,21 @@ path.theme = function(paths) {
         return replaceThemePath(paths);
     }
 
-}
+};
+
+path.relativePrepend = function(paths) {
+
+    var prepend = function(singlePath) {
+        return './' + path.normalize(singlePath);
+    };
+
+    if (Array.isArray(paths)) {
+        return paths.map(replaceThemePath);
+    } else {
+        return prepend(paths);
+    }
+
+};
 
 function error(error) {
     console.log('\n' + chalk.red('Error: ') + error.message + '\n');
@@ -129,15 +147,33 @@ function stylesheetsTransformer(src, isVendor) {
 
 }
 
-function scriptsTransformer(name, src) {
+function scriptsTransformer(name, src, isVendor) {
 
-    return gulp.src(path.theme(src))
-        .pipe(sourcemaps.init())
-        .pipe(concat(name + '.js'))
-        .pipe(uglify().on('error', error))
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(path.theme(paths.dest.scripts)));
+    var dest;
 
+    src = path.theme(src);
+    dest = path.theme(paths.dest.scripts);
+
+    if (!isVendor) {
+        return browserify({
+            entries: path.relativePrepend(src),
+            debug: true
+        })
+            .bundle()
+            .pipe(source(name + '.js'))
+            .pipe(buffer())
+            .pipe(sourcemaps.init({loadMaps: true}))
+            .pipe(uglify().on('error', error))
+            .pipe(sourcemaps.write('.'))
+            .pipe(gulp.dest(dest));
+    } else {
+        return gulp.src(src)
+            .pipe(sourcemaps.init())
+            .pipe(concat(name + '.js'))
+            .pipe(uglify().on('error', error))
+            .pipe(sourcemaps.write('./'))
+            .pipe(gulp.dest(dest));
+    }
 }
 
 /*
@@ -163,18 +199,18 @@ gulp.task('vendor/stylesheets', ['clean', 'icons'], function() {
 });
 
 gulp.task('vendor/scripts', ['clean'], function() {
-    return scriptsTransformer('vendor', paths.src.vendor.scripts);
+    return scriptsTransformer('vendor', paths.src.vendor.scripts, true);
 });
 
 gulp.task('app/stylesheets', ['clean', 'icons'], function() {
     return stylesheetsTransformer(paths.src.app.stylesheets);
 });
 
-gulp.task('app/scripts', ['clean'], function() {
+gulp.task('app/scripts', function() {
     var scripts = paths.src.app.scripts;
 
     return loopTransformers(Object.keys(scripts), function(name) {
-        return scriptsTransformer(name, scripts[name]);
+        return scriptsTransformer(name, scripts[name], false);
     });
 });
 

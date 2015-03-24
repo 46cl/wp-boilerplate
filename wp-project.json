@@ -24,7 +24,7 @@
                 "stylesheets": "%theme_path%/app/stylesheets/*.less",
 
                 "scripts": {
-                    "app": "%theme_path%/app/scripts/app/**"
+                    "app": "%theme_path%/app/scripts/app.js"
                 }
             }
         },
