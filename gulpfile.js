@@ -159,7 +159,8 @@ function scriptsTransformer(name, src, isVendor) {
             entries: path.relativePrepend(src),
             debug: true
         })
-            .bundle()
+            .transform(babelify)
+            .bundle().on('error', error)
             .pipe(source(name + '.js'))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
