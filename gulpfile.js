@@ -97,6 +97,13 @@ function loopTransformers(array, callback) {
     }
 }
 
+function watchLog(event) {
+    var type = event.type.toUpperCase().slice(0, 1) + event.type.toLowerCase().slice(1),
+        filepath = path.relative(__dirname, event.path);
+
+    console.log('\n' + chalk.yellow(type + ': ') + chalk.magenta(filepath) + '\n');
+}
+
 /*
  * Transformers
  */
@@ -181,13 +188,23 @@ function scriptsTransformer(name, src, isVendor) {
  * Tasks
  */
 
-gulp.task('default', ['clean', 'icons', 'vendor/stylesheets', 'vendor/scripts', 'app/stylesheets', 'app/scripts']);
+gulp.task('default', ['vendor', 'app']);
+gulp.task('vendor', ['vendor/stylesheets', 'vendor/scripts']);
+gulp.task('app', ['app/icons', 'app/stylesheets', 'app/scripts']);
 
 gulp.task('clean', function(cb) {
     del(path.theme(paths.dest.clean), cb);
 });
 
-gulp.task('icons', ['clean'], function() {
+gulp.task('vendor/stylesheets', function() {
+    return stylesheetsTransformer(paths.src.vendor.stylesheets, true);
+});
+
+gulp.task('vendor/scripts', function() {
+    return scriptsTransformer('vendor', paths.src.vendor.scripts, true);
+});
+
+gulp.task('app/icons', function() {
     var icons = paths.src.app.icons;
 
     return loopTransformers(Object.keys(icons), function(name) {
@@ -195,15 +212,7 @@ gulp.task('icons', ['clean'], function() {
     });
 });
 
-gulp.task('vendor/stylesheets', ['clean', 'icons'], function() {
-    return stylesheetsTransformer(paths.src.vendor.stylesheets, true);
-});
-
-gulp.task('vendor/scripts', ['clean'], function() {
-    return scriptsTransformer('vendor', paths.src.vendor.scripts, true);
-});
-
-gulp.task('app/stylesheets', ['clean', 'icons'], function() {
+gulp.task('app/stylesheets', ['app/icons'], function() {
     return stylesheetsTransformer(paths.src.app.stylesheets);
 });
 
@@ -220,10 +229,9 @@ gulp.task('app/scripts', function() {
  */
 
 gulp.task('watch', function(cb) {
-    var watcher = gulp.watch(path.theme(paths.watch), ['default']);
-
-    watcher.on('change', function(event) {
-        var type = event.type.toUpperCase().slice(0, 1) + event.type.toLowerCase().slice(1);
-        console.log('\n' + chalk.yellow(type + ': ') + chalk.magenta(event.path) + '\n');
-    });
+    gulp.watch(path.theme(paths.watch.vendor), ['vendor']).on('change', watchLog);
+    gulp.watch(path.theme(paths.watch.app.icons), ['app/icons', 'app/stylesheets']).on('change', watchLog);
+    gulp.watch(path.theme(paths.watch.app.stylesheets), ['app/icons', 'app/stylesheets']).on('change', watchLog);
+    gulp.watch(path.theme(paths.watch.app.scripts), ['app/scripts']).on('change', watchLog);
 });
+

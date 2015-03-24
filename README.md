@@ -112,9 +112,17 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
             "scripts": "%theme_path%/assets/"
         },
 
-        "tmp": "%theme_path%/.tmp/",
+        "watch": {
+            "vendor": "bower_components/**",
 
-        "watch": "%theme_path%/app/**"
+            "app": {
+                "icons": "%theme_path%/app/icons/**",
+                "stylesheets": "%theme_path%/app/stylesheets/**",
+                "scripts": "%theme_path%/app/scripts/**"
+            }
+        },
+
+        "tmp": "%theme_path%/.tmp/"
     }
 }
 ```
