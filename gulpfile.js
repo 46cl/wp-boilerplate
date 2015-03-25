@@ -188,12 +188,18 @@ function scriptsTransformer(name, src, isVendor) {
  * Tasks
  */
 
-gulp.task('default', ['vendor', 'app']);
+gulp.task('default', ['common', 'vendor', 'app']);
+gulp.task('common', ['common/copy']);
 gulp.task('vendor', ['vendor/stylesheets', 'vendor/scripts']);
 gulp.task('app', ['app/icons', 'app/stylesheets', 'app/scripts']);
 
 gulp.task('clean', function(cb) {
     del(path.theme(paths.dest.clean), cb);
+});
+
+gulp.task('common/copy', function() {
+    return gulp.src(path.theme(paths.src.common.copy))
+        .pipe(gulp.dest(path.theme(paths.dest.copy)));
 });
 
 gulp.task('vendor/stylesheets', function() {
@@ -229,6 +235,7 @@ gulp.task('app/scripts', function() {
  */
 
 gulp.task('watch', function(cb) {
+    gulp.watch(path.theme(paths.watch.common.copy), ['common/copy']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.vendor), ['vendor']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.app.icons), ['app/icons', 'app/stylesheets']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.app.stylesheets), ['app/icons', 'app/stylesheets']).on('change', watchLog);

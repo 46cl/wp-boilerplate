@@ -89,6 +89,10 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
 
     "assets-paths": {
         "src": {
+            "common": {
+                "copy": ""
+            },
+
             "vendor": {
                 "stylesheets": "bower_components/normalize.css/normalize.css",
                 "scripts": ""
@@ -107,12 +111,17 @@ You don't need to touch the `gulpfile.js` file to add new paths to the compilati
 
         "dest": {
             "clean": "%theme_path%/assets/",
+            "copy": "%theme_path%/assets/",
             "fonts": "%theme_path%/assets/fonts/",
             "stylesheets": "%theme_path%/assets/",
             "scripts": "%theme_path%/assets/"
         },
 
         "watch": {
+            "common": {
+                "copy": "bower_components/**"
+            },
+
             "vendor": "bower_components/**",
 
             "app": {
