@@ -71,7 +71,7 @@ class Boxes implements LoaderInterface
 
         if (!empty($id) || !empty($permalink)) {
             $query = array(
-                'post_type' => 'any',
+                'post_type' => array_keys(get_post_types()),
                 'nopaging' => true
             );
 

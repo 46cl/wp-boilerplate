@@ -259,7 +259,7 @@ jQuery(function() {
                             if (scope.binded) {
                                 NgModelCtrl.$setViewValue(post.id);
                             }
-
+                        }).finally(function() {
                             scope.loading = false;
                         });
                     },
