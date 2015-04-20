@@ -109,6 +109,7 @@ class Boxes implements LoaderInterface
         wp_enqueue_script('jquery-ui-widget');
         wp_enqueue_script('jquery-ui-mouse');
         wp_enqueue_script('jquery-ui-sortable');
+        wp_enqueue_media();
 
         // External JS dependencies
         wp_enqueue_script('boxes-angular', '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js');
