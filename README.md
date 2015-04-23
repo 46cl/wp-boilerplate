@@ -1,3 +1,5 @@
+__This project is currently is currently a work in progress. Expect breaking API changes!__
+
 # WP-Boilerplate
 
 A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), [Browserify](http://browserify.org/) (with [Babel](http://babeljs.io/) as an option), _icon fonts generation_, and _project management_ allowing to automatically install and run your new project on your working computer.
