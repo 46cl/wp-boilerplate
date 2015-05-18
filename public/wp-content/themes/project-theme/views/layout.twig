@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="{{ 'vendor.css'|asset('vendor') }}">
     <link rel="stylesheet" href="{{ 'app.css'|asset('app') }}">
 </head>
-<body>
+<body {% if device.isMobile %} data-is-mobile {% endif %}
+      {% if device.isTablet %} data-is-tablet {% endif %}
+      {% if device.isPhone %}  data-is-phone  {% endif %}>
 
     {% block content %}{% endblock %}
 
