@@ -279,7 +279,7 @@ commands.install = function() {
             '\n' + chalk.red('Error:'),
             'Some errors occured during the installation. Check if all the dependencies are installed and if your',
             'MySQL server is running. Next, run ' + chalk.yellow('npm run wp-clean') + ' and',
-            chalk.yellow('npm run wp-clean') + '.'
+            chalk.yellow('npm run wp-install') + '.'
         ].join(' '));
     }
 
