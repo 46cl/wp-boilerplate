@@ -46,12 +46,31 @@
     </label>
 </script>
 
+<script type="text/ng-template" id="field-wysiwyg.html">
+    <wp-editor options="(( field.options ))" ng-model="dataSet[field.name]"></wp-editor>
+</script>
+
 <script type="text/ng-template" id="field-upload.html">
     <upload-box options="(( field.options ))" ng-model="dataSet[field.name]"></upload-box>
 </script>
 
 <script type="text/ng-template" id="field-post.html">
     <post-box options="(( field.options ))" ng-model="dataSet[field.name]"></post-box>
+</script>
+
+<!-- WP Editor -->
+
+<script type="text/ng-template" id="wp-editor.html">
+    <div class="wp-core-ui wp-editor-wrap tmce-active">
+        <link rel="stylesheet" id="editor-buttons-css" href="/wp-includes/css/editor.min.css?ver=4.1.1" type="text/css" media="all" />
+        <div class="wp-editor-container">
+            <textarea class="wp-editor-area"
+                      rows="8"
+                      autocomplete="off"
+                      cols="40"
+                      ng-model="(( text ))"></textarea>
+        </div>
+    </div>
 </script>
 
 <!-- Upload button -->

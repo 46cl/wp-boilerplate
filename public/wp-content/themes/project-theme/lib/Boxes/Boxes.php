@@ -128,10 +128,19 @@ class Boxes implements LoaderInterface
         self::$originalDirname = Timber::$dirname;
         Timber::$dirname = 'lib/Boxes/views';
 
-        // First rendering, load Angular templates.
+        // First rendering
         if (!self::$renderedOnce) {
             self::$renderedOnce = true;
+
+            // Load Angular templates
             Timber::render('templates.twig');
+
+            // Declare a new WP editor, never output it. This allows to output the default set of TinyMCE options.
+            // The default set will be accessible in JS with `tinyMCEPreInit.mceInit.__boxes_defaults`.
+            // See: https://github.com/WordPress/WordPress/blob/00e4f35300720d13895adafa51361d9bb9f7c93b/wp-includes/class-wp-editor.php#L639
+            ob_start();
+            wp_editor('hello', '__boxes_defaults');
+            ob_end_clean();
         }
     }
 

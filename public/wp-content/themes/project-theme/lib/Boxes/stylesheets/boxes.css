@@ -161,6 +161,18 @@
 }
 
 /*
+ * WP Editor
+ */
+
+.sequential-boxes .wp-core-ui {
+    margin-bottom: 10px;
+}
+
+.sequential-boxes .wp-editor-container {
+    clear: none;
+}
+
+/*
  * Upload boxes
  */
 

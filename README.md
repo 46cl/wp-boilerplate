@@ -357,6 +357,14 @@ Boxes::sequential(
         ),
 
         /**
+         * A WP editor
+         */
+        array(
+            'type' => 'wysiwyg',
+            'name' => 'my_wysiwyg'
+        ),
+
+        /**
          * An upload box
          */
         array(

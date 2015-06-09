@@ -84,6 +84,53 @@ jQuery(function() {
     }])
 
     /*
+     * WP Editor
+     */
+
+    .directive('wpEditor', function() {
+
+        var link = function(scope, element, attrs, NgModelCtrl) {
+            var id = 'boxes-wysiwyg-' + (new Date).getTime();
+            element.find('textarea').attr('id', id);
+
+            // Retrieve the current data
+            scope.$watch(NgModelCtrl, function() {
+                scope.text = NgModelCtrl.$modelValue;
+            });
+
+            // Initialize the editor, based on this repository: https://github.com/hezachary/wordpress-wysiwyg-widget
+            setTimeout(function() {
+                tinymce.execCommand('mceRemoveEditor', true, id);
+
+                var initParams = tinymce.extend(tinyMCEPreInit.mceInit.__boxes_defaults, {
+                    selector: '#' + id,
+                    setup: function(editor) {
+                        editor.on('change', function(e) {
+                            scope.$apply(function() {
+                                scope.text = editor.getContent();
+                                NgModelCtrl.$setViewValue(scope.text);
+                            });
+                        });
+                    }
+                });
+
+                tinymce.init(initParams);
+            }, 0);
+
+        };
+
+        return {
+            restrict: 'E',
+            replace: true,
+            require: 'ngModel',
+            scope: {},
+            templateUrl: 'wp-editor.html',
+            link: link
+        };
+
+    })
+
+    /*
      * Upload box
      */
 
@@ -167,9 +214,7 @@ jQuery(function() {
             restrict: 'E',
             replace: true,
             require: '?ngModel',
-            scope: {
-                name: '@'
-            },
+            scope: {},
             templateUrl: 'upload-box.html',
             link: link
         };
@@ -325,9 +370,7 @@ jQuery(function() {
                 restrict: 'E',
                 replace: true,
                 require: '?ngModel',
-                scope: {
-                    name: '@'
-                },
+                scope: {},
                 templateUrl: 'post-box.html',
                 link: link
             };
