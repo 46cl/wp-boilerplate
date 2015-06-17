@@ -19,6 +19,7 @@
     "gulp-swig": "^0.7.4",
     "gulp-uglify": "^1.1.0",
     "gulp-util": "^3.0.3",
+    "merge-stream": "^0.1.7",
     "rimraf": "^2.2.8",
     "shelljs": "^0.3.0",
     "stream-combiner2": "^1.0.2",

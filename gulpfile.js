@@ -13,9 +13,9 @@ var babelify = require('babelify'),
     browserify = require('browserify'),
     buffer = require('vinyl-buffer'),
     chalk = require('chalk'),
-    combiner = require('stream-combiner2'),
     del = require('del'),
     gulp = require('gulp'),
+    mergeStream = require('merge-stream'),
     source = require('vinyl-source-stream');
 
 var concat = require('gulp-concat'),
@@ -93,7 +93,7 @@ function loopTransformers(array, callback) {
     });
 
     if (streams.length) {
-        return combiner.obj(streams);
+        return mergeStream.apply(null, streams);
     }
 }
 
