@@ -214,7 +214,9 @@ jQuery(function() {
             restrict: 'E',
             replace: true,
             require: '?ngModel',
-            scope: {},
+            scope: {
+                name: '@'
+            },
             templateUrl: 'upload-box.html',
             link: link
         };
@@ -370,7 +372,9 @@ jQuery(function() {
                 restrict: 'E',
                 replace: true,
                 require: '?ngModel',
-                scope: {},
+                scope: {
+                    name: '@'
+                },
                 templateUrl: 'post-box.html',
                 link: link
             };
