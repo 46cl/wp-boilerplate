@@ -43,4 +43,8 @@ call_user_func(function() {
 
     });
 
+    // Avoid emojis errors, see: https://core.trac.wordpress.org/ticket/32305
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+
 });
