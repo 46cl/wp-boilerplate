@@ -113,16 +113,23 @@ function iconsTransformer(name, iconsPaths) {
     return gulp.src(path.theme(iconsPaths.svgs))
         .pipe(iconfont({
             fontName: name,
-            appendCodepoints: true
+            normalize: true
         }))
-        .on('codepoints', function(codepoints, options) {
+        .on('glyphs', function(glyphs) {
+            glyphs = glyphs.map(function(glyph) {
+                return {
+                    name: glyph.name,
+                    codepoint: glyph.unicode[0].charCodeAt(0).toString(16).toUpperCase()
+                };
+            });
+
             gulp.src(path.theme(iconsPaths['stylesheet-tpl']))
                 .pipe(swig({
                     defaults: {cache: false},
                     data: {
                         name: name,
                         path: path.relative(path.theme(paths.dest.stylesheets), path.theme(paths.dest.fonts)),
-                        glyphs: codepoints
+                        glyphs: glyphs
                     }
                 }))
                 .pipe(rename({

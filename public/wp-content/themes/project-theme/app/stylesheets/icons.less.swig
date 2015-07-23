@@ -26,7 +26,7 @@
 {% for glyph in glyphs %}
 .{{ name }}-{{ glyph.name }} {
     &:before {
-        content: '\{{ glyph.codepoint.toString(16) }}';
+        content: '\{{ glyph.codepoint }}';
     }
 }
 {% endfor %}
