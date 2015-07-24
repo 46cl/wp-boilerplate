@@ -407,19 +407,3 @@ Boxes::sequential(
     )
 );
 ```
-
-## Contribute
-
-Clone the repository and add this line to your `~/.profile`:
-
-```shell
-export WP_BOILERPLATE_ENV="contrib"
-```
-
-This will bypass the following tasks when running the `npm run wp-install` command:
-
-* Renaming the project theme
-* Saving dependencies versions
-* Reinitializing the Git project
-
-If you occasionally want to revert back to the default environment, use `npm run wp-install -- --skip-env-check`.
