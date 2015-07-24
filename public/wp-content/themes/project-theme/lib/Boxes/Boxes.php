@@ -128,12 +128,15 @@ class Boxes implements LoaderInterface
         self::$originalDirname = Timber::$dirname;
         Timber::$dirname = 'lib/Boxes/views';
 
+        // Open a wrapper used to bootstrap the boxes inside
+        echo '<div boxes-bootstrap>';
+
+        // Load Angular templates
+        Timber::render('templates.twig');
+
         // First rendering
         if (!self::$renderedOnce) {
             self::$renderedOnce = true;
-
-            // Load Angular templates
-            Timber::render('templates.twig');
 
             // Declare a new WP editor, never output it. This allows to output the default set of TinyMCE options.
             // The default set will be accessible in JS with `tinyMCEPreInit.mceInit.__boxes_defaults`.
@@ -148,6 +151,9 @@ class Boxes implements LoaderInterface
     {
         // Revert to the original views directory
         Timber::$dirname = self::$originalDirname;
+
+        // Close the wrapper
+        echo '</div>';
     }
 
 }

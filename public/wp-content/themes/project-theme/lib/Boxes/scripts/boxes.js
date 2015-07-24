@@ -386,8 +386,8 @@ jQuery(function() {
      * Bootstrapping
      */
 
-    if (!$(document.body).hasClass('nav-menus-php')) {
-        angular.bootstrap(document, ['wp-admin']);
-    }
+    $('[boxes-bootstrap]').each(function() {
+        angular.bootstrap(this, ['wp-admin']);
+    });
 
 });
