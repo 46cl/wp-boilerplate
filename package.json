@@ -1,6 +1,6 @@
 {
   "name": "wp-boilerplate",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Wordpress boilerplate created by 46cl",
   "dependencies": {
     "babel": "^5.8.3",
