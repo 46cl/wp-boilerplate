@@ -14,6 +14,10 @@ class Boxes implements LoaderInterface
         });
 
         // Register API endpoints
+        add_action('wp_ajax_upload_box', function() {
+            self::uploadAjax();
+        });
+
         add_action('wp_ajax_post_box', function() {
             self::postAjax();
         });
@@ -61,6 +65,15 @@ class Boxes implements LoaderInterface
         ));
 
         self::destroy();
+    }
+
+    static private function uploadAjax()
+    {
+        $id = wp_unslash($_POST['id']);
+        $imgUrl = wp_get_attachment_image_src($id, 'full')[0];
+
+        header('Content-type: application/json');
+        die(json_encode($imgUrl));
     }
 
     static private function postAjax()

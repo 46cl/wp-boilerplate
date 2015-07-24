@@ -10,7 +10,7 @@ jQuery(function() {
         // Avoid Twig conflicts
         $interpolateProvider.startSymbol('((').endSymbol('))');
 
-        // Post data as form data
+        // Post data as form data because Wordpress doesn't support JSON
         $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
         $httpProvider.defaults.transformRequest = function(obj) {
             var encodedStr = [];
@@ -134,8 +134,11 @@ jQuery(function() {
      * Upload box
      */
 
-    .directive('uploadBox', ['$timeout', '$sequentialBoxes', function($timeout, $sequentialBoxes) {
+    .directive('uploadBox', ['$http', '$timeout', '$sequentialBoxes', function($http, $timeout, $sequentialBoxes) {
 
+        /**
+         * A wrapper to manage the media modal
+         */
         function newFrame(callback) {
             var frame = wp.media({
                 title: 'Sélectionner un fichier',
@@ -144,7 +147,8 @@ jQuery(function() {
             });
 
             frame.state('library').on('select', function () {
-                callback(this.get('selection').first().toJSON());
+                var image = this.get('selection').first().toJSON();
+                callback(image.id, image.url);
             });
 
             return frame;
@@ -152,22 +156,28 @@ jQuery(function() {
 
         function link(scope, element, attrs, NgModelCtrl) {
 
-            // Create a wrapper to manage the media modal
-            var select = function(image) {
-                scope.image = {};
+            function select(id, url) {
+                $timeout(function() {
+                    scope.imageId = id;
 
-                // Keep the following properties
-                ['id', 'title', 'caption', 'alt', 'description', 'url', 'sizes'].forEach(function(key) {
-                    scope.image[key] = image[key];
+                    // Update the model value
+                    if (scope.binded) {
+                        NgModelCtrl.$setViewValue(id);
+                    }
+
+                    // Retrieve the URL if necessary
+                    if (id !== undefined && !url) {
+                        $http.post('/wp-admin/admin-ajax.php', {
+                            action: 'upload_box',
+                            id: id
+                        }).success(function(url) {
+                            scope.imageUrl = url;
+                        });
+                    } else {
+                        scope.imageUrl = url;
+                    }
                 });
-
-                // Update the scopes
-                if (scope.binded) {
-                    NgModelCtrl.$setViewValue(scope.image);
-                }
-
-                scope.$apply();
-            };
+            }
 
             scope.frame = null;
             scope.binded = angular.isDefined(attrs.ngModel);
@@ -185,14 +195,15 @@ jQuery(function() {
             // Retrieve the current data
             if (scope.binded) {
                 scope.$watch(NgModelCtrl, function() {
-                    scope.image = NgModelCtrl.$modelValue;
+                    select(NgModelCtrl.$modelValue);
                 });
             } else {
                 try {
-                    scope.image = JSON.parse(attrs.value) || null;
-                    scope.image = (typeof scope.image == 'string') ? null : scope.image;
+                    var id = JSON.parse(attrs.value) || null;
+                    id = isNaN(parseInt(id)) ? undefined : parseInt(id);
+                    select(id);
                 } catch(e) {
-                    scope.image = null;
+                    select();
                 }
             }
 
@@ -202,6 +213,7 @@ jQuery(function() {
                 scope.frame.open();
             };
 
+            // If the `openModalOnAddition` is set to `true`, open the modal when an item is added.
             if (scope.options.openModalOnAddition && $sequentialBoxes.itemJustAdded) {
                 $timeout(function() {
                     scope.openModal();
