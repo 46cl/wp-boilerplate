@@ -1,2 +1,2 @@
-# Suport WebM's MIME type
+# Support WebM's MIME type
 AddType video/webm .webm
