@@ -1,6 +1,13 @@
 <?php
 
-// Autoloads classes, interfaces and traits. This is absolutely not PSR-0 compliant, deal with it.
+/*
+ * Autoloads classes, interfaces and traits. This is absolutely not PSR-0 compliant, deal with it.
+ *
+ * Here's the loaded file when you try to call:
+ *   - Test: lib/Test/Test.php
+ *   - TestInterface: lib/Test/TestInterface.php
+ *   - TestTrait: lib/Test/TestTrait.php
+ */
 spl_autoload_register(function($dependency) {
 
     $suffix = '';
