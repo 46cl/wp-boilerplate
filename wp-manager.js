@@ -290,7 +290,7 @@ commands.serve = function() {
     shell.cd(WP_ROOT);
 
     // Use the spawn method to preserve colors in the console
-    spawn('wp', ['server'].concat(process.argv.slice(3)), {stdio: 'inherit'});
+    spawn('wp', ['server', '--host=0.0.0.0'].concat(process.argv.slice(3)), {stdio: 'inherit'});
 
 };
 
