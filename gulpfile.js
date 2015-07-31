@@ -5,7 +5,7 @@
  */
 
 var project = require('./wp-project.json'),
-    paths = project['assets-paths'];
+    paths = require('./gulp-paths.json');
 
 var path = require('path');
 

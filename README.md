@@ -87,62 +87,9 @@ The boilerplate is provided with __Bower__ and a __Gulp__ configuration ready to
 
 All the assets that should be compiled live in the `app/` directory of your theme. The output after compilation will be saved to the `assets/` directory.
 
-You don't need to touch the `gulpfile.js` file to add new paths to the compilation tasks, everything lives in the `wp-project.json` file:
+You don't need to touch the `gulpfile.js` file to add new paths to the compilation tasks, everything lives in the [gulp-paths.json](gulp-paths.json) file.
 
-```js
-{
-    // ...
-
-    "assets-paths": {
-        "src": {
-            "common": {
-                "copy": ""
-            },
-
-            "vendor": {
-                "stylesheets": "bower_components/normalize.css/normalize.css",
-                "scripts": ""
-            },
-
-            "app": {
-                "icons": {},
-
-                "stylesheets": "%theme_path%/app/stylesheets/*.less",
-
-                "scripts": {
-                    "app": "%theme_path%/app/scripts/app.js"
-                }
-            }
-        },
-
-        "dest": {
-            "clean": "%theme_path%/assets/",
-            "copy": "%theme_path%/assets/",
-            "fonts": "%theme_path%/assets/fonts/",
-            "stylesheets": "%theme_path%/assets/",
-            "scripts": "%theme_path%/assets/"
-        },
-
-        "watch": {
-            "common": {
-                "copy": "bower_components/**"
-            },
-
-            "vendor": "bower_components/**",
-
-            "app": {
-                "icons": "%theme_path%/app/icons/**",
-                "stylesheets": "%theme_path%/app/stylesheets/**",
-                "scripts": "%theme_path%/app/scripts/**"
-            }
-        },
-
-        "tmp": "%theme_path%/.tmp/"
-    }
-}
-```
-
-The __%theme_path%__ keyword is automatically replaced at compilation time by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
+In this file, the __%theme_path%__ keyword is automatically replaced at compilation time by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
 
 Every path in the configuration file will be interpreted by the `gulp.src()` method (once the __%theme_path%__ keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
 

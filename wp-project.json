@@ -9,52 +9,5 @@
         "plugins": {
             "timber-library": null
         }
-    },
-
-    "assets-paths": {
-        "src": {
-            "common": {
-                "copy": ""
-            },
-
-            "vendor": {
-                "stylesheets": "bower_components/normalize.css/normalize.css",
-                "scripts": ""
-            },
-
-            "app": {
-                "icons": {},
-
-                "stylesheets": "%theme_path%/app/stylesheets/*.less",
-
-                "scripts": {
-                    "app": "%theme_path%/app/scripts/app.js"
-                }
-            }
-        },
-
-        "dest": {
-            "clean": "%theme_path%/assets/",
-            "copy": "%theme_path%/assets/",
-            "fonts": "%theme_path%/assets/fonts/",
-            "stylesheets": "%theme_path%/assets/",
-            "scripts": "%theme_path%/assets/"
-        },
-
-        "watch": {
-            "common": {
-                "copy": "bower_components/**"
-            },
-
-            "vendor": "bower_components/**",
-
-            "app": {
-                "icons": "%theme_path%/app/icons/**",
-                "stylesheets": "%theme_path%/app/stylesheets/**",
-                "scripts": "%theme_path%/app/scripts/**"
-            }
-        },
-
-        "tmp": "%theme_path%/.tmp/"
     }
 }
