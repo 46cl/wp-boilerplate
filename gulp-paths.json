@@ -12,6 +12,8 @@
         "app": {
             "icons": {},
 
+            "sprites": {},
+
             "stylesheets": "%theme_path%/app/stylesheets/*.less",
 
             "scripts": {
@@ -21,9 +23,9 @@
     },
 
     "dest": {
-        "clean": "%theme_path%/assets/",
         "copy": "%theme_path%/assets/",
         "fonts": "%theme_path%/assets/fonts/",
+        "images": "%theme_path%/assets/images/",
         "stylesheets": "%theme_path%/assets/",
         "scripts": "%theme_path%/assets/"
     },
@@ -37,10 +39,16 @@
 
         "app": {
             "icons": "%theme_path%/app/icons/**",
+            "sprites": "%theme_path%/app/sprites/**",
             "stylesheets": "%theme_path%/app/stylesheets/**",
             "scripts": "%theme_path%/app/scripts/**"
         }
     },
 
-    "tmp": "%theme_path%/.tmp/"
+    "tmp": "%theme_path%/.tmp/",
+
+    "clean": [
+        "%theme_path%/assets/",
+        "%theme_path%/.tmp/"
+    ]
 }

@@ -16,9 +16,11 @@ var babelify = require('babelify'),
     del = require('del'),
     gulp = require('gulp'),
     mergeStream = require('merge-stream'),
-    source = require('vinyl-source-stream');
+    source = require('vinyl-source-stream'),
+    sprity = require('sprity');
 
 var concat = require('gulp-concat'),
+    gulpIf = require('gulp-if'),
     gutil = require('gulp-util'),
     iconfont = require('gulp-iconfont'),
     less = require('gulp-less'),
@@ -108,9 +110,9 @@ function watchLog(event) {
  * Transformers
  */
 
-function iconsTransformer(name, iconsPaths) {
+function iconsTransformer(name, iconConf) {
 
-    return gulp.src(path.theme(iconsPaths.svgs))
+    return gulp.src(path.theme(iconConf.svgs))
         .pipe(iconfont({
             fontName: name,
             normalize: true
@@ -123,7 +125,7 @@ function iconsTransformer(name, iconsPaths) {
                 };
             });
 
-            gulp.src(path.theme(iconsPaths['stylesheet-tpl']))
+            gulp.src(path.theme(iconConf['stylesheet-tpl']))
                 .pipe(swig({
                     defaults: {cache: false},
                     data: {
@@ -145,6 +147,26 @@ function iconsTransformer(name, iconsPaths) {
                 .pipe(gulp.dest(path.theme(paths.dest.stylesheets)));
         })
         .pipe(gulp.dest(path.theme(paths.dest.fonts)));
+
+}
+
+function spritesTransformer(name, spriteConf) {
+
+    var options = {
+        src: path.theme(spriteConf.path),
+        cssPath: path.relative(path.theme(paths.dest.stylesheets), path.theme(paths.dest.images)),
+        style: name + '.css',
+        name: name,
+        prefix: name
+    };
+
+    if (spriteConf.dimensions) options.dimension = spriteConf.dimensions;
+
+    return sprity.src(options).pipe(gulpIf(
+        '*.css',
+        gulp.dest(path.theme(paths.dest.stylesheets)),
+        gulp.dest(path.theme(paths.dest.images))
+    ));
 
 }
 
@@ -198,10 +220,10 @@ function scriptsTransformer(name, src, isVendor) {
 gulp.task('default', ['common', 'vendor', 'app']);
 gulp.task('common', ['common/copy']);
 gulp.task('vendor', ['vendor/stylesheets', 'vendor/scripts']);
-gulp.task('app', ['app/icons', 'app/stylesheets', 'app/scripts']);
+gulp.task('app', ['app/icons', 'app/sprites', 'app/stylesheets', 'app/scripts']);
 
 gulp.task('clean', function(cb) {
-    del(path.theme(paths.dest.clean), cb);
+    del(path.theme(paths.clean), cb);
 });
 
 gulp.task('common/copy', function() {
@@ -225,6 +247,14 @@ gulp.task('app/icons', function() {
     });
 });
 
+gulp.task('app/sprites', function() {
+    var sprites = paths.src.app.sprites;
+
+    return loopTransformers(Object.keys(sprites), function(name) {
+        return spritesTransformer(name, sprites[name]);
+    });
+});
+
 gulp.task('app/stylesheets', ['app/icons'], function() {
     return stylesheetsTransformer(paths.src.app.stylesheets);
 });
@@ -245,6 +275,7 @@ gulp.task('watch', function(cb) {
     gulp.watch(path.theme(paths.watch.common.copy), ['common/copy']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.vendor), ['vendor']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.app.icons), ['app/icons', 'app/stylesheets']).on('change', watchLog);
+    gulp.watch(path.theme(paths.watch.app.sprites), ['app/sprites', 'app/stylesheets']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.app.stylesheets), ['app/icons', 'app/stylesheets']).on('change', watchLog);
     gulp.watch(path.theme(paths.watch.app.scripts), ['app/scripts']).on('change', watchLog);
 });

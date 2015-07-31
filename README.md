@@ -2,7 +2,7 @@ __This project is currently is currently a work in progress. Expect breaking API
 
 # WP-Boilerplate
 
-A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), [Browserify](http://browserify.org/) (with [Babel](http://babeljs.io/) as an option), _icon fonts generation_, and _project management_ allowing to automatically install and run your new project on your working computer.
+A Wordpress boilerplate created by 46cl, featuring [Timber](http://upstatement.com/timber/) (with [Twig](http://twig.sensiolabs.org/)), [Composer](https://getcomposer.org/), [Bower](http://bower.io/), [Gulp](http://gulpjs.com/), [Less](http://lesscss.org/), [Browserify](http://browserify.org/) (with [Babel](http://babeljs.io/) as an option), _icon fonts and CSS sprites generation_, and _project management_ allowing to automatically install and run your new project on your working computer.
 
 Tested on Wordpress 4.1+
 
@@ -83,7 +83,7 @@ The boilerplate is provided with a theme ready to use. It leverages some redunda
 
 ### Assets management
 
-The boilerplate is provided with __Bower__ and a __Gulp__ configuration ready to be used to concatenate script files and compile __Less__, with sourcemaps. Icon fonts generation also comes out of the box.
+The boilerplate is provided with __Bower__ and a __Gulp__ configuration ready to be used to concatenate script files and compile __Less__, with sourcemaps. Icon fonts and CSS sprites generation also comes out of the box.
 
 All the assets that should be compiled live in the `app/` directory of your theme. The output after compilation will be saved to the `assets/` directory.
 
@@ -93,7 +93,7 @@ In this file, the __%theme_path%__ keyword is automatically replaced at compilat
 
 Every path in the configuration file will be interpreted by the `gulp.src()` method (once the __%theme_path%__ keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
 
-### ES6 with Babel
+#### ES6 with Babel
 
 Every scripts will be automatically passed to Babel to transpile ES6 to ES5. However, don't forget to require the polyfill if you use some methods introduced by this version of the specification, same goes if you use generators:
 
@@ -132,7 +132,7 @@ Run `npm run watch` in your console and add your new stylesheet to your HTML:
 <link rel="stylesheet" href="{{ 'ico.css'|asset('app') }}">
 ```
 
-Now you can use the classes in your HTML:
+Now you can use the corresponding classes in your HTML:
 
 ```html
 <span class="ico ico-my-icon"></span>
@@ -148,6 +148,60 @@ If you want to use the classes created for your icon font in other stylesheets, 
     &:extend(.ico all, .ico-my-icon all);
 }
 ```
+
+#### CSS sprites generation
+
+You can generate CSS sprites through the gulp configuration. Choose a name for your sprite, "my-sprite" for example, and add a new object to the `sprites` section:
+
+```js
+// ...
+
+"sprites": {
+    "my-sprite": {
+        "path": "%theme_path%/app/sprites/my-sprite/**"
+    }
+},
+
+// ...
+```
+
+Run `npm run watch` in your console and add your new stylesheet to your HTML:
+
+```twig
+<link rel="stylesheet" href="{{ 'my-sprite.css'|asset('app') }}">
+```
+
+Now you can use the corresponding classes in your HTML:
+
+```html
+<div class="my-sprite my-sprite-image1"></div>
+```
+
+If you want to get rid of an additional HTTP request, you can also import the stylesheet in your `app.less` file:
+
+```less
+@import '../../assets/my-sprite.css';
+```
+
+It is worth mentioning you can also manage retina images. In your source folder, put the biggest dimensions of your images (they will be automatically resized) and add dimensions to your configuration:
+
+```js
+// ...
+
+"sprites": {
+    "my-sprite": {
+        "path": "%theme_path%/app/sprites/my-sprite/**",
+        "dimensions": [
+            {"ratio": 1, "dpi": 72},
+            {"ratio": 2, "dpi": 192}
+        ]
+    }
+},
+
+// ...
+```
+
+With this configuration, the retina sprite will be displayed on devices with a DPI >= 192. On other devices, a smaller sprite will be displayed.
 
 ### PHP dependencies
 
