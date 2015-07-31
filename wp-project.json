@@ -7,7 +7,8 @@
         "version": null,
 
         "plugins": [
-            "timber-library"
+            "timber-library",
+            "https://github.com/46cl/wp-custom-fields/releases/download/v0.1.0/46cl-custom-fields.zip"
         ]
     }
 }
