@@ -44,7 +44,7 @@ That's it!
 
 ## Installation
 
-Open the `wp-project.json` file and fill in the `title`, `slug` and `database` properties:
+Open the [wp-project.json](wp-project.json) file and fill in the `title`, `slug` and `database` properties:
 
 ```js
 {
@@ -76,6 +76,46 @@ npm run wp-serve -- --host=127.0.0.1 --port=8000
 You can now log in the back office with the __admin__ user and __admin__ password.
 
 To watch for your assets modifications, use `npm run watch`.
+
+## Plugin installation
+
+Open the [wp-project.json](wp-project.json) file and add the slug of the plugin you want to install in the `plugins` array:
+
+```js
+{
+    // ...
+
+    "wordpress": {
+        "version": null,
+
+        "plugins": [
+            // ...
+        ]
+    }
+}
+```
+
+For example, say you want to install [Really Simple CAPTCHA](https://wordpress.org/plugins/really-simple-captcha/), check the [Wordpress.org](https://wordpress.org/) url of the plugin and you will see the slug at the end:
+
+```
+https://wordpress.org/plugins/really-simple-captcha/
+```
+
+The slug is `really-simple-captcha`, add it to the configuration file:
+
+```js
+"plugins": [
+    "really-simple-captcha"
+]
+```
+
+Run `npm run wp-install`, your plugin will be installed and activated, the configuration will also be rewritten to include the last version number:
+
+```js
+"plugins": [
+    "really-simple-captcha@1.8.0.1"
+]
+```
 
 ## Theming
 

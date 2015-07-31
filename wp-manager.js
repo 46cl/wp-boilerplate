@@ -203,13 +203,14 @@ commands.install = function() {
             manager.wp('plugin uninstall ' + plugin.name);
         });
 
-        Object.keys(project.wordpress.plugins).forEach(function(name) {
-            var version = project.wordpress.plugins[name];
+        project.wordpress.plugins.forEach(function(pluginStr) {
+            var plugin = pluginStr.split('@')[0],
+                version = pluginStr.split('@')[1];
 
             if (!version) {
-                manager.wp('plugin install ' + name + ' --activate');
+                manager.wp('plugin install ' + plugin + ' --activate');
             } else {
-                manager.wp('plugin install ' + name + ' --version=' + version + ' --activate');
+                manager.wp('plugin install ' + plugin + ' --version=' + version + ' --activate');
             }
         });
     });
@@ -247,8 +248,18 @@ commands.install = function() {
     manager.task('Saving dependencies versions', function() {
         project.wordpress.version = manager.wp('core version').trim();
 
-        manager.wpPlugins().forEach(function(plugin) {
-            project.wordpress.plugins[plugin.name] = plugin.version;
+        manager.wpPlugins().forEach(function(pluginObj) {
+            var plugins = project.wordpress.plugins,
+                pluginIndex;
+
+            plugins.forEach(function(pluginStr, index) {
+                if (pluginStr.indexOf(pluginObj.name) == 0) pluginIndex = index;
+            });
+
+            if (pluginIndex !== undefined) {
+                var plugin = plugins[pluginIndex].split('@')[0];
+                plugins[pluginIndex] = plugin + '@' + pluginObj.version;
+            }
         });
 
         manager.writeFile('wp-project.json', JSON.stringify(project, null, 4));

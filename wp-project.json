@@ -6,8 +6,8 @@
     "wordpress": {
         "version": null,
 
-        "plugins": {
-            "timber-library": null
-        }
+        "plugins": [
+            "timber-library"
+        ]
     }
 }
