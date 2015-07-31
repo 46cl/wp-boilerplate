@@ -243,6 +243,19 @@ It is worth mentioning you can also manage retina images. In your source folder,
 
 With this configuration, the retina sprite will be displayed on devices with a DPI >= 192. On other devices, a smaller sprite will be displayed.
 
+### PHP helpers
+
+Here are some helpers provided with the theme:
+
+```php
+/**
+ * Save post meta data in the database.
+ * @param integer $post_id The ID of the post.
+ * @param string[] $fields An array containing the name of the fields.
+ */
+App\Meta::savePostData($post_id, $fields);
+```
+
 ### PHP dependencies
 
 Composer is installed with the theme, allowing you to easily add PHP dependencies. To run Composer through the command-line:
