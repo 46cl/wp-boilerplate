@@ -8,7 +8,7 @@
 
         "plugins": [
             "timber-library",
-            "https://github.com/46cl/wp-custom-fields/releases/download/v0.1.0/46cl-custom-fields.zip"
+            "https://github.com/46cl/wp-custom-fields/releases/download/v0.2.0/46cl-custom-fields.zip"
         ]
     }
 }
