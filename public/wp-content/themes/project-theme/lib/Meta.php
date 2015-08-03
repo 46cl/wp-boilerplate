@@ -6,7 +6,7 @@ class Meta
 {
 
     /**
-     * Save post meta data in the database.
+     * Save post meta data in the database, the $_POST values are automatically retrieved.
      * @param integer $post_id The ID of the post.
      * @param string[] $fields An array containing the name of the fields.
      */

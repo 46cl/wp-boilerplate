@@ -245,11 +245,32 @@ With this configuration, the retina sprite will be displayed on devices with a D
 
 ### PHP helpers
 
-Here are some helpers provided with the theme:
+#### Ajax
 
 ```php
 /**
- * Save post meta data in the database.
+ * Create a new Ajax endpoint with preconfigured headers for JSON values.
+ * @param string $action The action name associated to your endpoint.
+ * @param callable $handler The callback executed each time the endpoint is requested.
+ * @param boolean $isPublic Defines if the endpoint should be public or not.
+ */
+new App\Ajax\Endpoint($action, callable $handler, $isPublic = false);
+```
+
+```php
+/**
+ * Create a new public Ajax endpoint with preconfigured headers for JSON values.
+ * @param string $action The action name associated to your endpoint.
+ * @param callable $handler The callback executed each time the endpoint is requested.
+ */
+new App\Ajax\PublicEndpoint($action, callable $handler);
+```
+
+#### Meta
+
+```php
+/**
+ * Save post meta data in the database, the $_POST values are automatically retrieved.
  * @param integer $post_id The ID of the post.
  * @param string[] $fields An array containing the name of the fields.
  */
