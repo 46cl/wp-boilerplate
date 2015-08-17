@@ -4,5 +4,7 @@
             "App\\": "lib"
         }
     },
-    "require": {}
+    "require": {
+        "mobiledetect/mobiledetectlib": "^2.8"
+    }
 }
