@@ -3,7 +3,7 @@
 // Use a simple IIFE to avoid global variables
 call_user_func(function() {
 
-    $cssDir = get_stylesheet_directory_uri() . '/assets';
+    $assetsDir = get_stylesheet_directory_uri() . '/assets';
 
     // Move jQuery to the footer, include it by default, remove the "jquery-migrate" dependency.
     // NB: jQuery will be automatically moved in the header if a plugin requires it.
@@ -13,31 +13,33 @@ call_user_func(function() {
     });
 
     // Add a stylesheet to the admin
-    add_action('admin_enqueue_scripts', function() use ($cssDir) {
-        wp_enqueue_style('wp-boilerplate-admin', $cssDir . '/admin.css');
+    add_action('admin_enqueue_scripts', function() use ($assetsDir) {
+        wp_enqueue_style('wp-boilerplate-admin', $assetsDir . '/admin.css');
     });
 
     // Add a stylesheet for TinyMCE
-    add_action('after_setup_theme', function() use ($cssDir) {
-        add_editor_style($cssDir . '/editor.css');
+    add_action('after_setup_theme', function() use ($assetsDir) {
+        add_editor_style($assetsDir . '/editor.css');
     });
 
     // Register an "asset" filter to easily manage asset versions (see the "theme.php" file).
-    add_action('twig_apply_filters', function($twig) use ($cssDir) {
+    add_action('twig_apply_filters', function($twig) use ($assetsDir) {
 
-        // Load the theme configuration
-        $theme = require __DIR__ . '/theme.php';
+        $assetsVersions = App\Config::get('assets');
 
         // Register the filter
-        $twig->addFilter('asset', new Twig_Filter_Function(function($filepath, $assetName) use ($cssDir, $theme) {
-            if (strtolower(substr($filepath, 0, 4)) != 'http') {
-                $filepath = $cssDir . '/' . $filepath;
-            }
+        $twig->addFilter(
+            'asset',
+            new Twig_Filter_Function(function($filepath, $assetName) use ($assetsDir, $assetsVersions) {
+                if (strtolower(substr($filepath, 0, 4)) != 'http') {
+                    $filepath = $assetsDir . '/' . $filepath;
+                }
 
-            $hasQueryParams = strstr($filepath, '?') !== false;
+                $hasQueryParams = strstr($filepath, '?') !== false;
 
-            return $filepath . (!$hasQueryParams ? '?ver=' : '&ver=') . $theme['assets'][$assetName];
-        }));
+                return $filepath . (!$hasQueryParams ? '?ver=' : '&ver=') . $assetsVersions[$assetName];
+            })
+        );
 
         return $twig;
 

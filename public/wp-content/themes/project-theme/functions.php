@@ -9,3 +9,5 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 foreach (glob(__DIR__ .'/config{/,/*/}*.php', GLOB_BRACE) as $filename) {
     require_once $filename;
 }
+
+App\Config::processConfigFile();
