@@ -3,5 +3,8 @@
   "private": true,
   "dependencies": {
     "normalize.css": "~3.0.2"
+  },
+  "devDependencies": {
+    "html5shiv": "~3.7.3"
   }
 }

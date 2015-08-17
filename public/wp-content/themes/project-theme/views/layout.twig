@@ -8,8 +8,11 @@
 
     <link rel="stylesheet" href="{{ 'vendor.css'|asset('vendor') }}">
     <link rel="stylesheet" href="{{ 'app.css'|asset('app') }}">
+    {% include 'ie8-support/stylesheet.twig' %}
+    
 </head>
 <body>
+    {% include 'ie8-support/body.twig' %}
 
     {% block content %}{% endblock %}
 
@@ -18,6 +21,7 @@
     {# If you add dependencies in the vendor scripts, uncomment the line below. #}
     {# <script src="{{ 'vendor.js'|asset('vendor') }}"></script> #}
     <script src="{{ 'app.js'|asset('app') }}"></script>
-
+    {% include 'ie8-support/script.twig' %}
+    
 </body>
 </html>
