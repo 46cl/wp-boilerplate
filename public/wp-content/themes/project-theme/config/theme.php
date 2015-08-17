@@ -8,6 +8,8 @@ return array(
     // Disable Wordpress features in a snap
     'wordpress' => array(
         'comments' => true,
+        'pingbacks' => false,
+        'trackbacks' => false,
     ),
 
     // Array used by the "asset" Twig filter to define versions for your assets

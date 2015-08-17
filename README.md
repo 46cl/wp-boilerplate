@@ -12,14 +12,11 @@ Required dependencies:
 
 * [Git](http://git-scm.com/)
 * [PHP](http://php.net/) v5.3+
+* [Composer](https://getcomposer.org/)
 * [MySQL](http://www.mysql.fr/) v5.5+
 * [Node.js](http://nodejs.org/) (with NPM v2+)
 * [WP-CLI](http://wp-cli.org/)
 * [wp server](https://github.com/wp-cli/server-command)
-
-Optional __but recommended__ dependencies:
-
-* [Composer](https://getcomposer.org/)
 
 ### Quick setup for OS X users
 

@@ -9,9 +9,9 @@ class Config
 
     static public function processConfigFile()
     {
-        if (self::get('wordpress.comments') === false) {
-            Config\Comments::disable();
-        }
+        if (self::get('wordpress.comments') === false) Config\Comments::disable();
+        if (self::get('wordpress.pingbacks') === false) Config\Pingbacks::disable();
+        if (self::get('wordpress.trackbacks') === false) Config\Trackbacks::disable();
     }
 
     static public function get($propertyPath)
