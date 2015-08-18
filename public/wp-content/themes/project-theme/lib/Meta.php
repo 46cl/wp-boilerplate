@@ -7,17 +7,16 @@ class Meta
 
     /**
      * Call the right function to save datas in the database, the $_POST values are automatically retrieved.
-     * @param integer $data_id The ID of the post/user/comment.
+     * @param integer $entity_id The ID of the post/user/comment.
      * @param string[] $fields An array containing the name of the fields.
      * @param string $type The type of the data. Possible value: "post", "user" or "comment".
      */
-    static public function saveData($data_id, $fields, $type)
+    static public function saveData($entity_id, $fields, $type)
     {
-        $class = "update_".$type."_meta";
-
         foreach ($fields as $field) {
             $value = isset($_POST[$field]) ? $_POST[$field] : '';
-            $class($data_id, $field, $value);
+            var_dump("update_{$type}_meta");
+            call_user_func("update_{$type}_meta", $entity_id, $field, $value);
         }
     }
 
