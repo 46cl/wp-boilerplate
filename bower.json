@@ -2,9 +2,7 @@
   "name": "wp-boilerplate",
   "private": true,
   "dependencies": {
-    "normalize.css": "~3.0.2"
-  },
-  "devDependencies": {
+    "normalize.css": "~3.0.2",
     "html5shiv": "~3.7.3"
   }
 }
