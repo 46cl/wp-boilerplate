@@ -179,11 +179,22 @@ commands.install = function() {
      */
 
     manager.task('Downloading Wordpress files', function() {
-        if (!project.wordpress.version) {
-            manager.wp('core download --locale=fr_FR');
-        } else {
-            manager.wp('core download --locale=fr_FR --version=' + project.wordpress.version);
+        function install(withLocale) {
+            var locale = withLocale ? (' --locale=' + withLocale) : '';
+
+            if (!project.wordpress.version) {
+                manager.wp('core download' + locale);
+            } else {
+                manager.wp('core download' + locale + ' --version=' + project.wordpress.version);
+            }
         }
+
+        try {
+            install('fr_FR');
+        } catch(error) {
+            install();
+        }
+
     }, [notInstalledEnv]);
 
     manager.task('Configuring Wordpress', function() {
