@@ -20,7 +20,7 @@
                 "app": "%theme_path%/app/scripts/app.js",
                 "ie8-support": [
                     "bower_components/html5shiv/dist/html5shiv.js",
-                    "node_modules/es5-shim/es5-shim.min.js"
+                    "bower_components/es5-shim/es5-shim.js"
                 ]
             }
         }
