@@ -15,7 +15,6 @@ class Meta
     {
         foreach ($fields as $field) {
             $value = isset($_POST[$field]) ? $_POST[$field] : '';
-            var_dump("update_{$type}_meta");
             call_user_func("update_{$type}_meta", $entity_id, $field, $value);
         }
     }
