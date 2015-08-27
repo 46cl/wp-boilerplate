@@ -293,6 +293,49 @@ $ pwd
 $ npm run composer -- require vendor/name
 ```
 
-### Configuration
+### PHP Configuration
 
-In the configuration file of the theme (`config/theme.php`), you can define versions for your assets. Those will be used by the `asset` Twig filter, see the `views/layout.twig` file for an usage example of this filter.
+In the configuration file of the theme ([config/theme.php](public/wp-content/themes/project-theme/config/theme.php)), you can disable/enable Wordpress features and manage versions for your assets.
+
+#### Wordpress features
+
+Comments, pingbacks and trackbacks can easily be disabled/enabled by setting the associated key to `false`/`true`.
+
+To customize the admin menu, you provide an array containing the name of the item as a key and whether it should disabled/enabled as a boolean value. For submenus, simply use nested arrays. For example, say you want to disable the __Appearance__ menu and the __Media__ submenu in the __Settings__ menu, simply use this configuration:
+
+```php
+return array(
+
+    'wordpress' => array(
+        // ...
+
+        'admin_menu' => array(
+            'themes.php' => false,
+            'options-general.php' => array(
+                'options-media.php' => false,
+            ),
+        ),
+    ),
+
+    // ...
+
+);
+```
+
+The keys are based on the accepted values by the [`remove_menu_page`](https://codex.wordpress.org/Function_Reference/remove_menu_page) and [`remove_submenu_page`](https://codex.wordpress.org/Function_Reference/remove_submenu_page) functions.
+
+__Note:__ Pingbacks and trackbacks are disabled by default since they can be used as a gateway for DDoS attacks, see [issue #35](https://github.com/46cl/wp-boilerplate/issues/35).
+
+#### Asset versions
+
+You can define versions for your assets, those will be used by the `asset` Twig filter. If you define `2.2.1` for the `vendor` key, all your assets included through the `asset` filter with the `'vendor'` parameter will be appended with this query parameter: `ver=2.2.1`. This feature is useful to force browsers to refresh their cache.
+
+See the [views/layout.twig](public/wp-content/themes/project-theme/views/layout.twig) file for an usage example of this filter.
+
+#### Easy access to the configuration
+
+You can access a configuration property with the `App\Config::get($propertyPath)` method. For example, if you want to access to the `vendor` property in the `assets` array:
+
+```php
+App\Config::get('assets.vendor');
+```

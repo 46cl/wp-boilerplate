@@ -19,8 +19,8 @@ return array(
 
     // Array used by the "asset" Twig filter to define versions for your assets
     'assets' => array(
-        'vendor' => '0.0',
-        'app' => '0.0',
+        'vendor' => '0.0.0',
+        'app' => '0.0.0',
     )
 
 );
