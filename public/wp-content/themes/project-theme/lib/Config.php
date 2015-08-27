@@ -12,13 +12,18 @@ class Config
         if (self::get('wordpress.comments') === false) Config\Comments::disable();
         if (self::get('wordpress.pingbacks') === false) Config\Pingbacks::disable();
         if (self::get('wordpress.trackbacks') === false) Config\Trackbacks::disable();
+
+        Config\AdminMenu::disable(self::get('wordpress.admin_menu'));
     }
 
     static public function get($propertyPath)
     {
+        static $properties;
+        @$properties = $properties ?: require self::CONFIG_FILE;
+
         return array_reduce(explode('.', $propertyPath), function($parent, $propName) {
             return @$parent[$propName];
-        }, require self::CONFIG_FILE);
+        }, $properties);
     }
 
 }

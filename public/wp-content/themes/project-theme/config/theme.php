@@ -10,6 +10,11 @@ return array(
         'comments' => true,
         'pingbacks' => false,
         'trackbacks' => false,
+        'admin_menu' => array(
+            'options-general.php' => array(
+                'options-media.php' => false,
+            ),
+        ),
     ),
 
     // Array used by the "asset" Twig filter to define versions for your assets
