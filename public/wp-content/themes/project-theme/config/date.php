@@ -10,7 +10,7 @@ add_action('twig_apply_filters', function($twig) {
 
         if ($date instanceof DateTime) {
             $timestamp = $date->getTimestamp();
-        } else if ($date != 'now') {
+        } else if (is_numeric($date)) {
             $timestamp = intval($date);
         } else {
             $timestamp = strtotime($date);
