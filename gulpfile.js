@@ -57,7 +57,7 @@ path.theme = function(paths) {
             'public/wp-content/themes/' + (project.wordpress.version ? project.slug : 'project-theme')
         );
 
-        return path.normalize(singlePath);
+        return singlePath ? path.normalize(singlePath) : singlePath;
     };
 
     if (Array.isArray(paths)) {
@@ -227,8 +227,10 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('common/copy', function() {
-    return gulp.src(path.theme(paths.src.common.copy))
-        .pipe(gulp.dest(path.theme(paths.dest.copy)));
+    if (path.theme(paths.src.common.copy)) {
+        return gulp.src(path.theme(paths.src.common.copy))
+            .pipe(gulp.dest(path.theme(paths.dest.copy)));
+    }
 });
 
 gulp.task('vendor/stylesheets', function() {
