@@ -234,11 +234,19 @@ gulp.task('common/copy', function() {
 });
 
 gulp.task('vendor/stylesheets', function() {
-    return stylesheetsTransformer(paths.src.vendor.stylesheets, true);
+    var stylesheets = paths.src.vendor.stylesheets;
+
+    return loopTransformers(Object.keys(stylesheets), function(name) {
+        return stylesheetsTransformer(stylesheets[name], true);
+    });
 });
 
 gulp.task('vendor/scripts', function() {
-    return scriptsTransformer('vendor', paths.src.vendor.scripts, true);
+    var scripts = paths.src.vendor.scripts;
+
+    return loopTransformers(Object.keys(scripts), function(name) {
+        return scriptsTransformer(name, scripts[name], true);
+    });
 });
 
 gulp.task('app/icons', function() {
@@ -258,7 +266,11 @@ gulp.task('app/sprites', function() {
 });
 
 gulp.task('app/stylesheets', ['app/icons'], function() {
-    return stylesheetsTransformer(paths.src.app.stylesheets);
+    var stylesheets = paths.src.app.stylesheets;
+
+    return loopTransformers(Object.keys(stylesheets), function(name) {
+        return stylesheetsTransformer(stylesheets[name], false);
+    });
 });
 
 gulp.task('app/scripts', function() {
