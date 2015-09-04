@@ -110,6 +110,13 @@ function watchLog(event) {
  * Transformers
  */
 
+function copyTransformer(src, dest) {
+
+    return gulp.src(path.theme(src))
+        .pipe(gulp.dest(path.theme(dest)));
+
+}
+
 function iconsTransformer(name, iconConf) {
 
     return gulp.src(path.theme(iconConf.svgs))
@@ -211,6 +218,7 @@ function scriptsTransformer(name, src, isVendor) {
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest(dest));
     }
+
 }
 
 /*
@@ -227,10 +235,11 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('common/copy', function() {
-    if (path.theme(paths.src.common.copy)) {
-        return gulp.src(path.theme(paths.src.common.copy))
-            .pipe(gulp.dest(path.theme(paths.dest.copy)));
-    }
+    var sources = paths.src.common.copy;
+
+    return loopTransformers(Object.keys(sources), function(name) {
+        return copyTransformer(sources[name], paths.dest.copy[name]);
+    });
 });
 
 gulp.task('vendor/stylesheets', function() {

@@ -1,7 +1,7 @@
 {
     "src": {
         "common": {
-            "copy": ""
+            "copy": {}
         },
 
         "vendor": {
@@ -34,7 +34,8 @@
     },
 
     "dest": {
-        "copy": "%theme_path%/assets/",
+        "copy": {},
+
         "fonts": "%theme_path%/assets/fonts/",
         "images": "%theme_path%/assets/images/",
         "stylesheets": "%theme_path%/assets/",
@@ -43,7 +44,7 @@
 
     "watch": {
         "common": {
-            "copy": "bower_components/**"
+            "copy": ""
         },
 
         "vendor": "bower_components/**",
