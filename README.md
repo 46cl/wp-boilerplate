@@ -120,27 +120,120 @@ The boilerplate is provided with a theme ready to use. It leverages some redunda
 
 ### Assets management
 
-The boilerplate is provided with __Bower__ and a __Gulp__ configuration ready to be used to concatenate script files and compile __Less__, with sourcemaps. Icon fonts and CSS sprites generation also comes out of the box.
+The boilerplate is provided with Bower and a Gulp configuration ready to be used to concatenate script files and compile Less, with sourcemaps. Icon fonts and CSS sprites generation also comes out of the box.
 
 All the assets that should be compiled live in the `app/` directory of your theme. The output after compilation will be saved to the `assets/` directory.
 
-You don't need to touch the `gulpfile.js` file to add new paths to the compilation tasks, everything lives in the [gulp-paths.json](gulp-paths.json) file.
+You don't need to touch the [gulpfile.js](gulpfile.js) file to add new paths to the compilation tasks, everything lives in the [gulp-paths.json](gulp-paths.json) file.
 
-In this file, the __%theme_path%__ keyword is automatically replaced at compilation time by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
+In this file, the `%theme_path%` keyword is automatically replaced at runtime by the path of your theme, allowing you to have shorter paths in your config file and to easily rename your theme (don't forget [to update the configuration](#installation) if you do this).
 
-Every path in the configuration file will be interpreted by the `gulp.src()` method (once the __%theme_path%__ keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
+Every path or array of paths in the configuration file will be interpreted by the `gulp.src()` method (once the `%theme_path%` keyword is replaced), check [its documentation](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpsrcglobs-options) to understand the syntax.
 
-#### ES6 with Babel
+#### Structure of the [gulp-paths.json](gulp-paths.json) file
 
-Every scripts will be automatically passed to Babel to transpile ES6 to ES5. However, don't forget to require the polyfill if you use some methods introduced by this version of the specification, same goes if you use generators:
+Here's a simple description of the important parts:
 
 ```js
-require('babel/polyfill');
+{
+    // Contains the paths of the files you want to transform.
+    "src": {
+        // Contains tasks which behaviour doesn't differ between vendor and local
+        // files.
+        "common": {
+            // [task] Copy all the files from one directory to another.
+            "copy": {}
+        },
+
+        // Contains tasks related to the vendor files you want to transform.
+        "vendor": {
+            // [task] Concatenates and minifies stylesheets.
+            "stylesheets": {},
+            // [task] Concatenates and minifies scripts.
+            "scripts": {}
+        },
+
+        // Contains tasks related to the local files you want to transform.
+        "app": {
+            // [task] Generates icon fonts.
+            "icons": {},
+            // [task] Generates CSS sprites.
+            "sprites": {},
+            // [task] Compiles and minifies Less files.
+            "stylesheets": {},
+            // [task] Compiles and minifies ES6 files.
+            "scripts": {}
+        }
+    }
+}
 ```
+
+#### Basic tasks
+
+The `sprites` and `stylesheets` tasks are very simple to use. By using the configuration below (useless parts for the example, like the `dest` object, have been stripped), you will create a new `my-vendor-scripts.js` file in the `assets/` directory containing [Swiper](http://www.idangero.us/swiper/) and [Waypoints](http://imakewebthings.com/waypoints/) concatenated and minified:
+
+```js
+{
+    "src": {
+        "vendor": {
+            "scripts": {
+                "my-vendor-scripts": [
+                    "bower_components/swiper/dist/js/swiper.js",
+                    "bower_components/waypoints/lib/noframework.waypoints.js"
+                ]
+            }
+        }
+    }
+}
+```
+
+__Note:__ Remember to install your dependencies before adding them to your configuration. Here you would need to run `bower install swiper waypoints --save-dev`.
+
+One thing you should do is to always include the non-minified files (JS, CSS, whatever…), they will be automatically minified and source maps will be generated, this way you will be able to see the non-minified files in your inspector.
+
+#### Copy files
+
+To copy files, create a new entry in the `src.common.copy` object, the key is the name of your “copy task” and the value is the path(s) to your file(s).
+
+Say you want to use [Mapbox.js](https://github.com/mapbox/mapbox.js), this library comes with images used by its CSS file. Simply use this configuration:
+
+```js
+{
+    "src": {
+        "common": {
+            "copy": {
+                "mapbox": "bower_components/mapbox.js/theme/images/*.png"
+            }
+        }
+    },
+
+    "dest": {
+        "copy": {
+            "mapbox": "%theme_path%/assets/images/"
+        }
+    }
+}
+```
+
+In the `dest` object, we specify where we want to copy our files for the `mapbox` “copy task”.
+
+Since the source files can come from any location, the watched paths aren't configured out-of-the-box, remember to update the `watch` object:
+
+```js
+{
+    "watch": {
+        "common": {
+            "copy": "bower_components/mapbox.js/**"
+        }
+    }
+}
+```
+
+This way, if you run `bower update` while `npm run watch` is running, the new images while be automatically copied to the `assets/images/` directory.
 
 #### Icon fonts generation
 
-While the properties of the assets configuration should be clear, you could need some help for the `icons` section. If you have a bunch of SVG files you want to embed in a font you will need [to prepare them](https://github.com/nfroidure/gulp-iconfont#preparing-svgs).
+If you have a bunch of SVG files you want to embed in a font you will need [to prepare them](https://github.com/nfroidure/gulp-iconfont#preparing-svgs).
 
 Once this is done, choose a name for your font, "ico" for example, and add a new object to the `icons` section:
 
@@ -239,6 +332,14 @@ It is worth mentioning you can also manage retina images. In your source folder,
 ```
 
 With this configuration, the retina sprite will be displayed on devices with a DPI >= 192. On other devices, a smaller sprite will be displayed.
+
+#### ES6 with Babel
+
+Every scripts will be automatically passed to Babel to transpile ES6 to ES5. However, don't forget to require the polyfill if you use some methods introduced by this version of the specification, same goes if you use generators:
+
+```js
+require('babel/polyfill');
+```
 
 ### PHP helpers
 
