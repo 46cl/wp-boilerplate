@@ -24,7 +24,9 @@
             "sprites": {},
 
             "stylesheets": {
-                "app": "%theme_path%/app/stylesheets/*.less"
+                "app": "%theme_path%/app/stylesheets/app.less",
+                "admin": "%theme_path%/app/stylesheets/admin.less",
+                "editor": "%theme_path%/app/stylesheets/editor.less"
             },
 
             "scripts": {

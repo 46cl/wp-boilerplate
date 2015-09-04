@@ -177,14 +177,14 @@ function spritesTransformer(name, spriteConf) {
 
 }
 
-function stylesheetsTransformer(src, isVendor) {
+function stylesheetsTransformer(name, src, isVendor) {
 
     return gulp.src(path.theme(src))
         .pipe(sourcemaps.init())
-        .pipe(!isVendor ? gutil.noop() : concat('vendor.css'))
+        .pipe(!isVendor ? gutil.noop() : concat(name + '.css'))
         .pipe(!isVendor ? less().on('error', error) : gutil.noop())
         .pipe(minifyCss(gulpOpts.minifyCss).on('error', error))
-        .pipe(rename({extname: '.css'}))
+        .pipe(rename(name + '.css'))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(path.theme(paths.dest.stylesheets)));
 
@@ -246,7 +246,7 @@ gulp.task('vendor/stylesheets', function() {
     var stylesheets = paths.src.vendor.stylesheets;
 
     return loopTransformers(Object.keys(stylesheets), function(name) {
-        return stylesheetsTransformer(stylesheets[name], true);
+        return stylesheetsTransformer(name, stylesheets[name], true);
     });
 });
 
@@ -278,7 +278,7 @@ gulp.task('app/stylesheets', ['app/icons'], function() {
     var stylesheets = paths.src.app.stylesheets;
 
     return loopTransformers(Object.keys(stylesheets), function(name) {
-        return stylesheetsTransformer(stylesheets[name], false);
+        return stylesheetsTransformer(name, stylesheets[name], false);
     });
 });
 
