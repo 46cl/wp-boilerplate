@@ -5,8 +5,17 @@
         },
 
         "vendor": {
-            "stylesheets": "bower_components/normalize.css/normalize.css",
-            "scripts": ""
+            "stylesheets": {
+                "vendor": "bower_components/normalize.css/normalize.css"
+            },
+
+            "scripts": {
+                "vendor": "",
+                "ie8-support": [
+                    "bower_components/html5shiv/dist/html5shiv.js",
+                    "bower_components/es5-shim/es5-shim.js"
+                ]
+            }
         },
 
         "app": {
@@ -14,14 +23,12 @@
 
             "sprites": {},
 
-            "stylesheets": "%theme_path%/app/stylesheets/*.less",
+            "stylesheets": {
+                "app": "%theme_path%/app/stylesheets/*.less"
+            },
 
             "scripts": {
-                "app": "%theme_path%/app/scripts/app.js",
-                "ie8-support": [
-                    "bower_components/html5shiv/dist/html5shiv.js",
-                    "bower_components/es5-shim/es5-shim.js"
-                ]
+                "app": "%theme_path%/app/scripts/app.js"
             }
         }
     },
