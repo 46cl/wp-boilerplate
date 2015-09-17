@@ -16,7 +16,6 @@ Required dependencies:
 * [MySQL](http://www.mysql.fr/) v5.5+
 * [Node.js](http://nodejs.org/) (with NPM v2+)
 * [WP-CLI](http://wp-cli.org/)
-* [wp server](https://github.com/wp-cli/server-command)
 
 ### Quick setup for OS X users
 
@@ -28,14 +27,6 @@ brew install git php56 mysql node wp-cli composer
 ```
 
 Make sure MySQL's server is started with `mysql.server start`.
-
-Install __wp server__ with the following commands (based [on this guide](https://github.com/wp-cli/wp-cli/wiki/Community-Packages#installing-a-package-without-composer)):
-
-```shell
-mkdir -p ~/.wp-cli/commands
-git clone https://github.com/wp-cli/server-command.git ~/.wp-cli/commands/server
-echo -e "require:\n  - commands/server/command.php" > ~/.wp-cli/config.yml
-```
 
 That's it!
 
